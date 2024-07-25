@@ -1,0 +1,25 @@
+name: Linting and Unit Testing
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: sleep
+        run: sleep 10
+
+      # Gesture Firebase
+      - name: ESLint gesture-firebase
+        run: echo "ESLint and Unit Tests for Gesture Firebase"
+
+      # Gesture Firebase User
+      - name: ESLint gesture-firebase-user
+        run: echo "ESLint and Unit Tests for Gesture Firebase User"

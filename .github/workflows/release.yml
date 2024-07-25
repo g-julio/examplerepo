@@ -1,0 +1,36 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - 'production'  # Only trigger on the production branch
+
+jobs:
+  semantic-release:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all tags and branches
+  
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Gesture Firebase release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd gesture-firebase && npm ci && npx semantic-release
+
+      - name: Gesture Firebase User release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd gesture-firebase-user && npm ci && npx semantic-release

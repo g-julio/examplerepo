@@ -1,0 +1,16 @@
+{
+  "name": "gesture-firebase-user",
+  "version": "1.0.12",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "semantic-release": "^19.0.5",
+    "semantic-release-npm-github-publish": "^1.5.4"
+  }
+}

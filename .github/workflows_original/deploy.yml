@@ -1,0 +1,83 @@
+name: Firebase Deploy
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select environment to deploy'
+        required: true
+        type: choice
+        default: 'all'
+        options:
+          - 'all'
+          - 'staging'
+          - 'production'
+      project:
+        description: 'Select project to deploy'
+        required: true
+        type: choice
+        default: 'all'
+        options:
+          - 'all'
+          - 'gesture-firebase'
+          - 'gesture-firebase-user'
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Debug
+        run: |
+          echo "Ref: ${{ github.ref }}"
+
+      - name: Enable debug logging
+        run: echo "::debug::Enabling debug logging"
+
+      - name: Debug
+        uses: raven-actions/debug@v1
+        with:
+          vars-context: ${{ toJson(github.ref) }}  # optional
+
+  staging-deploy:
+    # Deploy only on pushes to the staging branch or when manually triggered and the staging branch is selected or all environments is selected
+    if: (startsWith(github.ref, 'refs/heads/staging')) || (github.event.inputs.environment == 'all' || github.event.inputs.environment == 'staging')
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Staging deployment
+        if: startsWith(github.ref, 'refs/heads/staging') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          echo "Deploying staging"
+
+  production-deploy:
+    # Deploy only on tagged releases to the production branch or when manually triggered and the production branch is selected or all environments is selected
+    if: >
+      (
+        (startsWith(github.ref, 'refs/tags/gesture-firebase') || 
+        startsWith(github.ref, 'refs/tags/gesture-firebase-user')) &&
+        (github.event.base_ref == 'refs/heads/production' ||
+        github.event.release.target_commitish == 'production')
+      ) || 
+      github.event.inputs.environment == 'all' || 
+      github.event.inputs.environment == 'production'
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Staging deployment
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          echo "Deploying production"
