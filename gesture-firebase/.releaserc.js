@@ -5,5 +5,5 @@ const globalConfig = require('../.releaserc');
  */
 module.exports = {
   ...globalConfig,
-  tagFormat: "v${version}",
+  tagFormat: "gesture-firebase-v${version}",
 };
