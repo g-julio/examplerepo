@@ -32,14 +32,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check user
-        uses: TheModdingInquisition/actions-team-membership@v1.0
+        uses: actions/github-script@v7
+        id: my-script
         with:
-          team: 'my-team'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          exit: true
-      - name: Check team membership
-        if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
-        run: echo "User is a member of the octocats team"
+          result-encoding: string
+          retries: 3
+          script: |
+            const { data: members } = await octokit.teams.listMembers({
+              team_id: 'superadmin'
+            });
+            return members.some(member => member.login === context.actor);
 
   staging-deploy:
     # Deploy only on pushes to the staging branch or when manually triggered and the staging branch is selected or all environments is selected
