@@ -28,6 +28,19 @@ on:
           - 'gesture-firebase-user'
 
 jobs:
+  check-access:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check user
+        uses: marcocarvalho/team-membership@v3
+        id: checkUserMember
+        with:
+          username: ${{ github.actor }}
+          team: 'octocats'
+      - name: Check team membership
+        if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
+        run: echo "User is a member of the octocats team"
+
   staging-deploy:
     # Deploy only on pushes to the staging branch or when manually triggered and the staging branch is selected or all environments is selected
     if: (startsWith(github.ref, 'refs/heads/staging')) || (github.event.inputs.environment == 'all' || github.event.inputs.environment == 'staging')
