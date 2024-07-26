@@ -38,8 +38,9 @@ jobs:
           result-encoding: string
           retries: 3
           script: |
-            const { data: members } = await github.teams.listMembers({
-              team_id: 'superadmin'
+            const { data: members } = await github.rest.teams.listMembersInOrg({
+              org: 'g-julio',
+              team_slug: 'superadmin'
             });
             return members.some(member => member.login === context.actor);
 
