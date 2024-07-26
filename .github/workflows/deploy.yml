@@ -32,12 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check user
-        uses: marcocarvalho/team-membership@v3
-        id: checkUserMember
+        uses: TheModdingInquisition/actions-team-membership@v1.0
         with:
-          username: ${{ github.actor }}
-          team: 'octocats'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          team: 'my-team'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          exit: true
       - name: Check team membership
         if: ${{ steps.checkUserMember.outputs.isTeamMember == 'true' }}
         run: echo "User is a member of the octocats team"
