@@ -30,6 +30,7 @@ on:
 jobs:
   check-access:
     runs-on: ubuntu-latest
+    permissions: read-all
     steps:
       - name: Check user
         uses: actions/github-script@v7
