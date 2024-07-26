@@ -38,7 +38,7 @@ jobs:
           result-encoding: string
           retries: 3
           script: |
-            const { data: members } = await octokit.teams.listMembers({
+            const { data: members } = await github.teams.listMembers({
               team_id: 'superadmin'
             });
             return members.some(member => member.login === context.actor);
