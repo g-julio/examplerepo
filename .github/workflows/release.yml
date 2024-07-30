@@ -11,10 +11,18 @@ jobs:
       
     runs-on: ubuntu-latest
     steps:
+      - name: Create GitHub App Token
+        uses: actions/create-github-app-token@v1.10.3
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_SEMANTIC_RELEASE_ID }}
+          private-key: ${{ secrets.APP_SEMANTIC_RELEASE_SECRET }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history for all tags and branches
+          token: ${{ steps.app-token.outputs.token }}
   
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -22,13 +30,9 @@ jobs:
           node-version: '20'
 
       - name: Gesture Firebase release
-        env:
-          GH_TOKEN: ${{ secrets.TEST_TOKEN }}
         run: |
           cd gesture-firebase && npm ci && npx semantic-release
 
       - name: Gesture Firebase User release
-        env:
-          GH_TOKEN: ${{ secrets.TEST_TOKEN }}
         run: |
           cd gesture-firebase-user && npm ci && npx semantic-release
