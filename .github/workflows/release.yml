@@ -30,9 +30,13 @@ jobs:
           node-version: '20'
 
       - name: Gesture Firebase release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd gesture-firebase && npm ci && npx semantic-release
 
       - name: Gesture Firebase User release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd gesture-firebase-user && npm ci && npx semantic-release
