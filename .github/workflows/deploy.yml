@@ -28,6 +28,23 @@ on:
           - 'gesture-firebase-user'
 
 jobs:
+  check-access:
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+      - name: Check user
+        uses: actions/github-script@v7
+        id: my-script
+        with:
+          result-encoding: string
+          retries: 3
+          script: |
+            const { data: members } = await github.rest.teams.listMembersInOrg({
+              org: 'g-julio',
+              team_slug: 'superadmin'
+            });
+            return members.some(member => member.login === context.actor);
+
   staging-deploy:
     # Deploy only on pushes to the staging branch or when manually triggered and the staging branch is selected or all environments is selected
     if: (startsWith(github.ref, 'refs/heads/staging')) || (github.event.inputs.environment == 'all' || github.event.inputs.environment == 'staging')
