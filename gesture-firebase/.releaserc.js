@@ -1,4 +1,5 @@
 const { releaseRules } = require("semantic-release-npm-github-publish");
+const customTransform = require("semantic-release-npm-github-publish/commit-transform");
 const globalConfig = require('../.releaserc');
 
 /**
@@ -11,4 +12,12 @@ module.exports = {
     ...releaseRules,
     { scope: "no-release", release: false }
   ],
+  writerOpts: {
+    transform: (commit, context) => {
+      if (commit?.scope === 'no-release') {
+        return null;
+      }
+      return customTransform(commit, context);
+    }
+  },
 };
