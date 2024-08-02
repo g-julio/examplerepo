@@ -1,9 +1,11 @@
+const { releaseRules } = require("semantic-release-npm-github-publish");
+const customTransform = require("semantic-release-npm-github-publish/commit-transform");
 const globalConfig = require('../.releaserc');
 
 /**
  * @type {import('semantic-release').GlobalConfig}
  */
 module.exports = {
-  ...globalConfig,
+  ...globalConfigFactory(customTransform, releaseRules),
   tagFormat: "gesture-firebase-user-v${version}",
 };
