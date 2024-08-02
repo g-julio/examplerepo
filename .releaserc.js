@@ -1,5 +1,3 @@
-const { releaseRules } = require("semantic-release-npm-github-publish");
-
 /**
  * @type {import('semantic-release').GlobalConfig}
  */
@@ -19,10 +17,6 @@ module.exports = {
         failComment: false,
       }
     ]
-  ],
-  releaseRules: [
-    ...releaseRules,
-    { scope: "no-release", release: false }
   ],
   extends: "semantic-release-npm-github-publish",
 };
