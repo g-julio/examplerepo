@@ -2,7 +2,7 @@ name: Linting and Unit Testing
 
 on:
   push:
-    branches: '*'
+    # branches: '*'
   workflow_dispatch:
 
 jobs:
