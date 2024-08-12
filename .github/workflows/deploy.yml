@@ -10,10 +10,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Hello world action step
+        env:
+          INFISICAL_PROJECT_ID: '593067cd-5aa1-4860-b02c-42ccc666e20c'
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          OUTPUT_PATH: '.env'
         uses: ./ # Uses an action in the root directory
-        id: hello
-        with:
-          who-to-greet: 'greet everyone'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+
+      - name: Echo env file
+        run: cat .env
