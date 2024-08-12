@@ -30,15 +30,16 @@ jobs:
             echo "PROJECT_ID=test-project-d2235" >> $GITHUB_OUTPUT
             echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}" >> $GITHUB_OUTPUT
           fi
+
   build_and_deploy:
     runs-on: ubuntu-latest
     needs: define-environment
     if: ${{ needs.define-environment.outputs.ENV }}
-    environment:
-      name: ${{ needs.define-environment.outputs.ENV }}
     env:
       INFISICAL_PROJECT_ID: "593067cd-5aa1-4860-b02c-42ccc666e20c"
       INFISICAL_PATH: "/sub-folder"
+    environment:
+      name: ${{ needs.define-environment.outputs.ENV }}
     steps:
       - uses: actions/checkout@v4
 
@@ -56,6 +57,9 @@ jobs:
         run: cat .env
 
       - run: echo "# npm ci && npm run build"
+
+      - name: Debug Outputs
+        run: echo "ENV=${{ steps.set-environment.outputs.ENV }}, PROJECT_ID=${{ steps.set-environment.outputs.PROJECT_ID }}, FIREBASE_SERVICE_ACCOUNT=${{ steps.set-environment.outputs.FIREBASE_SERVICE_ACCOUNT }}"
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
