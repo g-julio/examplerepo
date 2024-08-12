@@ -10,13 +10,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Hello world action step
-        env:
-          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
-          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          INFISICAL_PROJECT_ID: '593067cd-5aa1-4860-b02c-42ccc666e20c'
-          INFISICAL_PATH: '/sub-folder'
-          OUTPUT_PATH: '.env'
         uses: ./ # Uses an action in the root directory
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: '593067cd-5aa1-4860-b02c-42ccc666e20c'
+          path: '/sub-folder'
 
       - name: Echo env file
         run: cat .env

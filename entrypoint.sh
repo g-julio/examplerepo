@@ -1,6 +1,12 @@
 #!/bin/sh -l
 
 echo $(infisical -v)
+INFISICAL_TOKEN=$INPUT_TOKEN
+INFISICAL_CLIENT_ID=$INPUT_CLIENT-ID
+INFISICAL_CLIENT_SECRET=$INPUT_SECRET
+INFISICAL_PROJECT_ID=$INPUT_PROJECT-ID
+INFISICAL_PATH=$INPUT_PATH
+OUTPUT_PATH=$INPUT_OUT-PATH
 
 if [ -z "$INFISICAL_TOKEN" ]; then
 
@@ -9,8 +15,10 @@ if [ -z "$INFISICAL_TOKEN" ]; then
         exit 1
     fi
 
-    export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${INFISICAL_CLIENT_ID} --client-secret=${INFISICAL_CLIENT_SECRET} --silent --plain)
+    INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${INFISICAL_CLIENT_ID} --client-secret=${INFISICAL_CLIENT_SECRET} --silent --plain)
 fi
+
+export INFISICAL_TOKEN=$INFISICAL_TOKEN
 
 if [ -z "$INFISICAL_PROJECT_ID" ]; then
     echo "Error: INFISICAL_PROJECT_ID not found."

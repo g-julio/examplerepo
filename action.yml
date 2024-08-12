@@ -1,16 +1,28 @@
-# action.yml
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Infisical secret fetcher'
+description: 'Get ENV variables using Infisical CLI'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  token:
+    description: 'Token used to authenticate with Infisical'
+    required: false
+  client-id:
+    description: 'Client ID used to authenticate with Infisical in case token is not provided'
+    required: false
+  secret:
+    description: 'Secret used to authenticate with Infisical in case token is not provided'
+    required: false
+  project-id:
+    description: 'Project ID used to get the ENV variables'
     required: true
-    default: 'World'
+  path:
+    description: 'Path inside Infisical project to get the ENV variables'
+    required: false
+  out-path:
+    description: 'Path to save the ENV variables. Default is .env'
+    required: false
+    default: '.env'
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  env:
+    description: 'ENV variables'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.who-to-greet }}
