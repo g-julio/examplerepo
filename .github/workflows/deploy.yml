@@ -12,9 +12,9 @@ jobs:
       - name: Hello world action step
         uses: ./ # Uses an action in the root directory
         with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client: ${{ secrets.INFISICAL_CLIENT_ID }}
           secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: '593067cd-5aa1-4860-b02c-42ccc666e20c'
+          project: '593067cd-5aa1-4860-b02c-42ccc666e20c'
           path: '/sub-folder'
 
       - name: Echo env file
