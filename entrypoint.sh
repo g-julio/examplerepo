@@ -13,17 +13,17 @@ if [ -z "$INFISICAL_TOKEN" ]; then
 fi
 
 if [ -z "$INFISICAL_PROJECT_ID" ]; then
-	echo "Error: INFISICAL_PROJECT_ID not found."
-	exit 1
+    echo "Error: INFISICAL_PROJECT_ID not found."
+    exit 1
 fi
 
 TO_RUN_COMMAND="infisical export --projectId=${INFISICAL_PROJECT_ID}"
 
 if [ -n "$INFISICAL_PATH" ]; then
-	TO_RUN_COMMAND="$TO_RUN_COMMAND --path=${INFISICAL_PATH}"
+    TO_RUN_COMMAND="$TO_RUN_COMMAND --path=${INFISICAL_PATH}"
 fi
 
-RESULT=$(eval $TO_RUN_COMMAND)
+RESULT=$($TO_RUN_COMMAND)
 
 if [ $? -ne 0 ]; then
     echo "Error: Command failed. Please check the provided parameters and try again."
@@ -31,7 +31,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ -n "$OUTPUT_PATH" ]; then
-	echo $RESULT > $OUTPUT_PATH
+    echo "$RESULT" > $OUTPUT_PATH
 fi
 
-echo "env=$RESULT" >> $GITHUB_OUTPUT
+echo "$RESULT" >> $GITHUB_OUTPUT
