@@ -20,12 +20,12 @@ jobs:
       - name: Set Environment
         id: set-environment
         run: |
-          if [[ ${{ github.ref }} == *"/staging" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_OUTPUT
             echo "PROJECT_ID=test-project-d2235" >> $GITHUB_OUTPUT
             echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}" >> $GITHUB_OUTPUT
             
-          elif [[ ${{ github.ref }} == "refs/tags/v"* && ${{ github.event.release.target_commitish }} == "production" ]]; then
+          elif [[ "${{ github.ref }}" == refs/tags/v* && "${{ github.event.release.target_commitish }}" == "production" ]]; then
             echo "ENV=prod" >> $GITHUB_OUTPUT
             echo "PROJECT_ID=test-project-d2235" >> $GITHUB_OUTPUT
             echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}" >> $GITHUB_OUTPUT
