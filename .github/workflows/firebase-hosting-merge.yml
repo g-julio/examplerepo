@@ -59,7 +59,7 @@ jobs:
       - run: echo "# npm ci && npm run build"
 
       - name: Debug Outputs
-        run: echo "ENV=${{ steps.set-environment.outputs.ENV }}, PROJECT_ID=${{ steps.set-environment.outputs.PROJECT_ID }}, FIREBASE_SERVICE_ACCOUNT=${{ steps.set-environment.outputs.FIREBASE_SERVICE_ACCOUNT }}"
+        run: echo "ENV=${{ needs.define-environment.outputs.ENV }}, PROJECT_ID=${{ needs.define-environment.outputs.PROJECT_ID }}, FIREBASE_SERVICE_ACCOUNT=${{ needs.define-environment.outputs.FIREBASE_SERVICE_ACCOUNT }}"
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
