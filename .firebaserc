@@ -10,8 +10,9 @@
         ],
         "prod-test-project-d2235": [
           "prod-test-project-d2235"
-        ],
+        ]
       }
     }
-  }
+  },
+  "etags": {}
 }
