@@ -1,0 +1,97 @@
+name: Firebase Deploy
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - staging
+
+jobs:
+  staging-deploy:
+    if: startsWith(github.ref, 'refs/heads/staging')
+    environment: staging
+    env:
+      INFISICAL_PROJECT_ID: 593067cd-5aa1-4860-b02c-42ccc666e20c
+      INFISICAL_PATH: /sub-folder
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}
+      FIREBASE_PROJECT_ID: test-project-d2235
+      TARGET: test-project-d2235
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+
+      - name: Login to Infisical and export envs
+        run: |
+          export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
+          infisical export --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" > .env
+
+      - name: Build
+        run: |
+          echo "npm run build"
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ env.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          target: ${{ env.TARGET }}
+          channelId: live
+
+  production-deploy:
+    if: startsWith(github.ref, 'refs/tags/v') && (github.event.base_ref == 'refs/heads/production' || github.event.release.target_commitish == 'production')
+    environment: production
+    env:
+      INFISICAL_PROJECT_ID: 593067cd-5aa1-4860-b02c-42ccc666e20c
+      INFISICAL_PATH: /sub-folder
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}
+      FIREBASE_PROJECT_ID: test-project-d2235
+      TARGET: prod-test-project-d2235
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+
+      - name: Login to Infisical and export envs
+        run: |
+          export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
+          infisical export --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" > .env
+
+      - name: Build
+        run: |
+          npm run build
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ env.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          target: ${{ env.TARGET }}
+          channelId: live
