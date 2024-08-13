@@ -8,38 +8,21 @@ on:
 jobs:
   semantic-release:
     permissions: write-all
-    env:
-      INFISICAL_PROJECT_ID: '593067cd-5aa1-4860-b02c-42ccc666e20c'
-      INFISICAL_PATH: '/ci-cd'
+      
     runs-on: ubuntu-latest
     steps:
-      - name: Install Infisical CLI
-        run: |
-          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
-          sudo apt-get update && sudo apt-get install -y infisical
-
-      - name: Login to Infisical and export envs
-        run: |
-          export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
-          infisical export --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" >> $GITHUB_ENV
-
-      - name: Check infisical vars
-        run: |
-          echo $MY_VAR
-          echo $SECOUND_VAR
-
       - name: Create GitHub App Token
         uses: actions/create-github-app-token@v1.10.3
         id: app-token
         with:
-          app-id: ${{ secrets.APP_SEMANTIC_RELEASE_ID }}
-          private-key: ${{ secrets.APP_SEMANTIC_RELEASE_SECRET }}
+          app-id: ${{ secrets.APP_SEMANTIC_RELEASE_ID_TEST }}
+          private-key: ${{ secrets.APP_SEMANTIC_RELEASE_SECRET_TEST }}
 
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history for all tags and branches
-          token: ${{ steps.app-token.outputs.token }}    
+          token: ${{ steps.app-token.outputs.token }}
   
       - name: Set up Node.js
         uses: actions/setup-node@v4
