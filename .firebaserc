@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "test-project-d2235"
+  },
+  "targets": {
+    "test-project-d2235": {
+      "hosting": {
+        "test-project-d2235": [
+          "test-project-d2235"
+        ],
+        "prod-test-project-d2235": [
+          "prod-test-project-d2235"
+        ],
+      }
+    }
   }
 }
