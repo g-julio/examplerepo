@@ -87,7 +87,7 @@ jobs:
 
       - name: Build
         run: |
-          npm run build
+          echo "npm run build"
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
