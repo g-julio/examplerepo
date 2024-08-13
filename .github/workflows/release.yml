@@ -26,6 +26,7 @@ jobs:
       - name: Check infisical vars
         run: |
           echo $MY_VAR
+          echo $SECOUND_VAR
 
       - name: Create GitHub App Token
         uses: actions/create-github-app-token@v1.10.3
