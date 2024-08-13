@@ -16,7 +16,7 @@ jobs:
       INFISICAL_PATH: /sub-folder
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}
       FIREBASE_PROJECT_ID: test-project-d2235
-      TARGET: staging
+      TARGET: test-project-d2235
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -49,7 +49,7 @@ jobs:
         with:
           firebaseServiceAccount: ${{ env.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          # target: ${{ env.TARGET }}
+          target: ${{ env.TARGET }}
           channelId: live
 
   production-deploy:
@@ -60,7 +60,7 @@ jobs:
       INFISICAL_PATH: /sub-folder
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TEST_PROJECT_D2235 }}
       FIREBASE_PROJECT_ID: test-project-d2235
-      TARGET: staging
+      TARGET: prod-test-project-d2235
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -93,5 +93,5 @@ jobs:
         with:
           firebaseServiceAccount: ${{ env.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          # target: ${{ env.TARGET }}
+          target: ${{ env.TARGET }}
           channelId: live
