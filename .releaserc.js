@@ -13,6 +13,13 @@ module.exports = {
   plugins: [
     "@semantic-release/commit-analyzer",
     [
+      "@semantic-release/git",
+      {
+        "assets": ["package.json"],
+        "tag": false
+      }
+    ],
+    [
       "@semantic-release/npm",
       {
         "npmPublish": false
