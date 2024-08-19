@@ -12,28 +12,10 @@ module.exports = {
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    [
-      "@semantic-release/github",
-      {
-        draftRelease: true,
-        successComment: false,
-        failTitle: false,
-        failComment: false,
-      }
-    ]
+    "@semantic-release/release-notes-generator"
   ],
-  extends: "semantic-release-npm-github-publish",
   releaseRules: [
     ...releaseRules,
     { scope: "no-release", release: false }
-  ],
-  writerOpts: {
-    transform: (commit, context) => {
-      if (commit?.scope === 'no-release') {
-        return null;
-      }
-      return customTransform(commit, context);
-    }
-  },
+  ]
 };
