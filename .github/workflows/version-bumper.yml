@@ -54,5 +54,5 @@ jobs:
           git add ./package.json
           git add ./package-lock.json
           git commit -m "chore(no-release): bump npm version to ${{env.NEXT_VERSION}}"
-          echo "Changes committed to ${{ github.ref_name }}
+          echo "Changes committed to ${{ github.ref_name }}"
           git push origin HEAD:${{ github.ref_name }}
