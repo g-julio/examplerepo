@@ -31,21 +31,16 @@ jobs:
         id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REF: ${{ github.head_ref }}
-          CI: false
         run: |
-          echo "Current ref:=>>> => ${{github.head_ref}}"
-          echo "Current ref:=>>> => ${{env.GITHUB_REF}}"
-          printenv
           git checkout ${{github.head_ref}}
-          export GITHUB_REF=${{github.head_ref}} && npx semantic-release --dry-run  --branches "${{github.head_ref}}" | tee release_output.log
+          export GITHUB_REF=${{github.head_ref}} && npx semantic-release --dry-run --no-ci --branches "${{github.head_ref}}" | tee release_output.log
           VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
           echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Update version in package.json
         run: |
           echo "Updating package.json to version ${{env.NEXT_VERSION}}"
-          npm version ${{env.NEXT_VERSION}} --no-git-tag-version
+          npm version ${{env.NEXT_VERSION}} --no-git-tag-version || echo "Already using ${{env.NEXT_VERSION}}"
 
       - name: Check if there are changes to commit
         run: |
