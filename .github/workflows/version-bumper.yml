@@ -29,6 +29,8 @@ jobs:
 
       - name: Run semantic-release in dry-run mode
         id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx semantic-release --dry-run --branches staging | tee release_output.log
           VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
