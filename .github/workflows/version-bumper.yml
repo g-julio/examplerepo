@@ -34,7 +34,8 @@ jobs:
           GITHUB_REF: ${{ github.head_ref }}
           CI: false
         run: |
-          echo "Current ref: => ${{github.head_ref}}"
+          echo "Current ref:=>>> => ${{github.head_ref}}"
+          echo "Current ref:=>>> => ${{env.GITHUB_REF}}"
           printenv
           git checkout ${{github.head_ref}}
           npx semantic-release --dry-run  --branches "${{github.head_ref}}" | tee release_output.log
