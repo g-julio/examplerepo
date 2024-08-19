@@ -1,7 +1,7 @@
 name: Version Bumper
 
 on:
-  push:
+  pull_request:
     branches:
       - staging
 
@@ -31,6 +31,7 @@ jobs:
         id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: false
         run: |
           npx semantic-release --dry-run --branches staging | tee release_output.log
           VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
@@ -54,5 +55,5 @@ jobs:
           git add ./package.json
           git add ./package-lock.json
           git commit -m "chore(no-release): bump npm version to ${{env.NEXT_VERSION}}"
-          echo "Changes committed to ${{ github.ref_name }}"
-          git push origin HEAD:${{ github.ref_name }}
+          echo "Commiting changes to ${{github.head_ref}}"
+          git push origin HEAD:${{ github.head_ref }}
