@@ -19,7 +19,6 @@ module.exports = {
       }
     ]
   ],
-  extends: "semantic-release-npm-github-publish",
   releaseRules: [
     ...releaseRules,
     { scope: "no-release", release: false }
