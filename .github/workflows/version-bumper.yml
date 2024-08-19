@@ -1,17 +1,18 @@
-name: Update npm version on PR
+name: Version Bumper
 
 on:
   push:
     branches:
       - staging
-  pull_request:
-    branches:
-      - staging
-      - production
 
 jobs:
-  check-version:
+  bumper:
+    name: Version Bumper
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      SHOULD_COMMIT: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,45 +24,32 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Get PR version
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run semantic-release in dry-run mode
+        id: semantic-release
         run: |
-          PR_VERSION=$(jq -r '.version' < package.json)
-          echo "PR_VERSION=$PR_VERSION" >> $GITHUB_ENV
+          npx semantic-release --dry-run --branches staging | tee release_output.log
+          VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
+          echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Get current production version
+      - name: Update version in package.json
         run: |
-          git checkout production
-          CURRENT_VERSION=$(jq -r '.version' < package.json)
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          echo "Updating package.json to version $NEXT_VERSION"
+          npm version $NEXT_VERSION --no-git-tag-version
 
-      - name: Check if PR version is greater than production version
+      - name: Check if there are changes to commit
         run: |
-          npx semver -r "$CURRENT_VERSION" "$PR_VERSION" || exit 1
-          echo "Version in PR ($PR_VERSION) is valid and greater than production version ($CURRENT_VERSION)."
+          git diff --exit-code || (echo "SHOULD_COMMIT=true" >> $GITHUB_ENV && exit 1)
 
-  # update-version:
-  #   runs-on: ubuntu-latest
-  #   needs: check-version
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16' # or your preferred version
-
-  #     - name: Bump npm version
-  #       run: |
-  #         npm version minor --no-git-tag-version
-  #         git config --local user.email "action@github.com"
-  #         git config --local user.name "GitHub Action"
-  #         git add package.json
-  #         git commit -m "Bump npm version"
-  #         git push origin HEAD:${{ github.head_ref }}
-        
-  #     # - name: Export Firestore indexes
-  #     #     git add ./gesture-firebase/firestore.indexes.json
-  #     #     git add ./gesture-firebase-user/firestore.indexes.json
-  #     #     git commit -m "Exported Firestore indexes [skip ci]"
-  #     #     git push origin HEAD:${{ github.head_ref }}
+      - name: Commit changes
+        if: env.SHOULD_COMMIT == 'true'
+        run: |
+          git config pull.rebase true
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./package.json
+          git add ./package-lock.json
+          git commit -m "chore(no-release): bump npm version to $NEXT_VERSION"
+          git push origin HEAD:${{ github.head_ref }}

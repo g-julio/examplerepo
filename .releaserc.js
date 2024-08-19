@@ -1,4 +1,5 @@
 const { releaseRules } = require("semantic-release-npm-github-publish");
+const customTransform = require("semantic-release-npm-github-publish/commit-transform");
 
 /**
  * Gesture Semantic Release Configuration Factory
@@ -7,27 +8,32 @@ const { releaseRules } = require("semantic-release-npm-github-publish");
 module.exports = {
   tagFormat: "v${version}",
   branches: [
-    "production",
-    "staging"
+    "production"
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
     [
-      "@semantic-release/npm",
+      "@semantic-release/github",
       {
-        "npmPublish": false
+        draftRelease: true,
+        successComment: false,
+        failTitle: false,
+        failComment: false,
       }
-    ],
-    [
-      "@semantic-release/exec",
-      {
-        "publishCmd": "exit 0",
-        "successCmd": "exit 0"
-      }
-    ],
+    ]
   ],
+  extends: "semantic-release-npm-github-publish",
   releaseRules: [
     ...releaseRules,
     { scope: "no-release", release: false }
-  ]
+  ],
+  writerOpts: {
+    transform: (commit, context) => {
+      if (commit?.scope === 'no-release') {
+        return null;
+      }
+      return customTransform(commit, context);
+    }
+  },
 };
