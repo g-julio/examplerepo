@@ -1,7 +1,7 @@
 name: Version Bumper
 
 on:
-  pull_request:
+  push:
     branches:
       - staging
 
@@ -38,8 +38,8 @@ jobs:
 
       - name: Update version in package.json
         run: |
-          echo "Updating package.json to version $NEXT_VERSION"
-          npm version $NEXT_VERSION --no-git-tag-version
+          echo "Updating package.json to version ${{env.NEXT_VERSION}}"
+          npm version ${{env.NEXT_VERSION}} --no-git-tag-version
 
       - name: Check if there are changes to commit
         run: |
@@ -53,5 +53,6 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./package.json
           git add ./package-lock.json
-          git commit -m "chore(no-release): bump npm version to $NEXT_VERSION"
+          git commit -m "chore(no-release): bump npm version to ${{env.NEXT_VERSION}}"
+          echo "Changes committed to ${{github.head_ref}}"
           git push origin HEAD:${{ github.head_ref }}
