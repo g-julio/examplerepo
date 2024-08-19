@@ -43,7 +43,7 @@ jobs:
 
       - name: Check if there are changes to commit
         run: |
-          git diff --exit-code || (echo "SHOULD_COMMIT=true" >> $GITHUB_ENV && exit 1)
+          git diff --exit-code || (echo "SHOULD_COMMIT=true" >> $GITHUB_ENV)
 
       - name: Commit changes
         if: env.SHOULD_COMMIT == 'true'
