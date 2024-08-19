@@ -17,7 +17,14 @@ module.exports = {
       {
         "npmPublish": false
       }
-    ]
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "exit 0",
+        "successCmd": "exit 0"
+      }
+    ],
   ],
   releaseRules: [
     ...releaseRules,
