@@ -32,9 +32,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Current ref: => ${{github.ref}}"
+          echo "Current ref: => ${{github.head_ref}}"
           git checkout ${{github.head_ref}}
-          npx semantic-release --dry-run  --branches "${{github.ref}}" | tee release_output.log
+          npx semantic-release --dry-run  --branches "${{github.head_ref}}" | tee release_output.log
           VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
           echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
 
