@@ -1,10 +1,9 @@
 name: Version Bumper
 
 on:
-  pull_request:
+  push:
     branches:
       - staging
-      - production
 
 jobs:
   bumper:
