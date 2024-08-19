@@ -31,7 +31,7 @@ jobs:
         id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REF: ${{ github.head_ref }}
+          # GITHUB_REF: ${{ github.head_ref }}
         run: |
           echo "Current ref: => ${{github.head_ref}}"
           printenv
