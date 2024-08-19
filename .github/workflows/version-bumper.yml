@@ -1,7 +1,7 @@
 name: Version Bumper
 
 on:
-  push:
+  pull_request:
     branches:
       - staging
 
@@ -32,6 +32,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REF: ${{ github.head_ref }}
+          CI: false
         run: |
           echo "Current ref: => ${{github.head_ref}}"
           printenv
@@ -58,5 +59,5 @@ jobs:
           git add ./package.json
           git add ./package-lock.json
           git commit -m "chore(no-release): bump npm version to ${{env.NEXT_VERSION}}"
-          echo "Changes committed to ${{github.head_ref}}"
+          echo "Commiting changes to ${{github.head_ref}}"
           git push origin HEAD:${{ github.head_ref }}
