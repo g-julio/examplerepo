@@ -14,49 +14,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16' # or your preferred version
-
-      - name: Install dependencies
-        run: npm install semver
-
-      - name: Get current production version
-        run: |
-          git fetch origin production:production
-          CURRENT_VERSION=$(jq -r '.version' < package.json)
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          node-version: '20'
 
       - name: Get PR version
         run: |
           PR_VERSION=$(jq -r '.version' < package.json)
           echo "PR_VERSION=$PR_VERSION" >> $GITHUB_ENV
 
+      - name: Get current production version
+        run: |
+          git checkout production
+          CURRENT_VERSION=$(jq -r '.version' < package.json)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
       - name: Check if PR version is greater than production version
         run: |
           npx semver -r "$CURRENT_VERSION" "$PR_VERSION" || exit 1
           echo "Version in PR ($PR_VERSION) is valid and greater than production version ($CURRENT_VERSION)."
 
-  update-version:
-    runs-on: ubuntu-latest
-    needs: check-version
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # update-version:
+  #   runs-on: ubuntu-latest
+  #   needs: check-version
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16' # or your preferred version
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16' # or your preferred version
 
-      - name: Bump npm version
-        run: |
-          npm version minor --no-git-tag-version
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add package.json
-          git commit -m "Bump npm version"
-          git push origin HEAD:${{ github.head_ref }}
+  #     - name: Bump npm version
+  #       run: |
+  #         npm version minor --no-git-tag-version
+  #         git config --local user.email "action@github.com"
+  #         git config --local user.name "GitHub Action"
+  #         git add package.json
+  #         git commit -m "Bump npm version"
+  #         git push origin HEAD:${{ github.head_ref }}
+        
+  #     # - name: Export Firestore indexes
+  #     #     git add ./gesture-firebase/firestore.indexes.json
+  #     #     git add ./gesture-firebase-user/firestore.indexes.json
+  #     #     git commit -m "Exported Firestore indexes [skip ci]"
+  #     #     git push origin HEAD:${{ github.head_ref }}
