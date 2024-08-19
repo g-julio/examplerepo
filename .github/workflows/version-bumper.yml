@@ -33,6 +33,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Current ref: => ${{github.head_ref}}"
+          printenv
           git checkout ${{github.head_ref}}
           npx semantic-release --dry-run  --branches "${{github.head_ref}}" | tee release_output.log
           VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
