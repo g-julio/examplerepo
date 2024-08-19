@@ -7,7 +7,6 @@ const customTransform = require("semantic-release-npm-github-publish/commit-tran
  */
 module.exports = {
   tagFormat: "v${version}",
-  ci: false,
   branches: [
     "production"
   ],
