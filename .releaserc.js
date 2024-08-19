@@ -7,15 +7,34 @@ const customTransform = require("semantic-release-npm-github-publish/commit-tran
  */
 module.exports = {
   tagFormat: "v${version}",
+  ci: false,
   branches: [
     "production"
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator"
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/github",
+      {
+        draftRelease: true,
+        successComment: false,
+        failTitle: false,
+        failComment: false,
+      }
+    ]
   ],
+  extends: "semantic-release-npm-github-publish",
   releaseRules: [
     ...releaseRules,
     { scope: "no-release", release: false }
-  ]
+  ],
+  writerOpts: {
+    transform: (commit, context) => {
+      if (commit?.scope === 'no-release') {
+        return null;
+      }
+      return customTransform(commit, context);
+    }
+  },
 };
