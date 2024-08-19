@@ -32,7 +32,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx semantic-release --dry-run --no-ci --branches staging | tee release_output.log
+          unset GITHUB_ACTIONS && npx semantic-release --dry-run --branches staging | tee release_output.log
           VERSION=$(grep "The next release version is" release_output.log | awk '{print $NF}')
           echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
 
