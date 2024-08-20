@@ -34,6 +34,7 @@ jobs:
           TAG_REF: github.ref || '""'
         id: define-env
         run: |
+          printenv
           if [[ ${{ env.BRANCH_REF }} == 'refs/heads/production' || (${{ env.COMMITISH }} == 'production' && ${{ env.TAG_REF }} == 'refs/tags/v'*) ]]; then
             echo "APP_ENV=production" >> "$GITHUB_OUTPUT"
           else
