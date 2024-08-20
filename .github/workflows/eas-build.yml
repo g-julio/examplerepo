@@ -28,10 +28,13 @@ jobs:
       app_env: ${{ steps.define-env.outputs.APP_ENV }}
     steps:
       - name: Define envirnment output if branch production or tags start with 'v'
-      # startsWith(github.ref, 'refs/tags/v') && (github.event.base_ref == 'refs/heads/production' || github.event.release.target_commitish == 'production')
+        env:
+          BRANCH_REF: github.ref || github.event.base_ref || '""'
+          COMMITISH: github.event.release.target_commitish || '""'
+          TAG_REF: github.ref || '""'
         id: define-env
         run: |
-          if [[ ${{ github.ref }} == 'refs/heads/production' || (${{ github.event.release.target_commitish }} == 'production' && ${{ github.ref }} == 'refs/tags/v'*) ]]; then
+          if [[ ${{ env.BRANCH_REF }} == 'refs/heads/production' || (${{ env.COMMITISH }} == 'production' && ${{ env.TAG_REF }} == 'refs/tags/v'*) ]]; then
             echo "APP_ENV=production" >> "$GITHUB_OUTPUT"
           else
             echo "APP_ENV=staging" >> "$GITHUB_OUTPUT"
