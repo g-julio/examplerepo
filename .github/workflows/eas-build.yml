@@ -45,7 +45,7 @@ jobs:
           fi
 
   build:
-    name: Build
+    name: Build to ${{ needs.define-env.outputs.app_env }}
     runs-on: ubuntu-latest
     needs: define-env
     environment: ${{ needs.define-env.outputs.app_env }}
