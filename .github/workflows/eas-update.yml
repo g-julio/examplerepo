@@ -29,6 +29,7 @@ jobs:
 
   update:
     name: Update to ${{ needs.define-env.outputs.app_env }}
+    needs: define-env
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Checkout
