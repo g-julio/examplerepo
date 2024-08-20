@@ -1,0 +1,79 @@
+name: EAS Update
+
+on:
+  workflow_dispatch
+
+jobs:
+  define-env:
+    name: Define Environment
+    runs-on: ubuntu-latest
+    outputs:
+      app_env: ${{ steps.define-env.outputs.APP_ENV }}
+    steps:
+      - name: Define environment
+        id: define-env
+        env:
+          BRANCH_REF: ${{ github.ref }}
+          BASE_REF: ${{ github.event.base_ref }}
+          COMMITISH: ${{ github.event.release.target_commitish }}
+          TAG_REF: ${{ github.ref }}
+        run: |
+          if [[ "$BRANCH_REF" == *"heads/production" ]] || 
+             (([[ "$BASE_REF" == *"heads/production" ]] || 
+             [[ "$COMMITISH" == "production" ]]) && 
+             [[ "$TAG_REF" == refs/tags/v* ]]); then
+            echo "APP_ENV=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "APP_ENV=staging" >> "$GITHUB_OUTPUT"
+          fi
+
+  update:
+    name: Update to ${{ needs.define-env.outputs.app_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🏗 Install dependencies
+        run: echo "npm ci"
+
+      - name: Install Infisical CLI and login
+        run: |
+            echo "infisical login"
+
+      - name: 🏗 Setup Expo and EAS
+        run: echo "expo login"
+        # uses: expo/expo-github-action@v8
+        # with:
+        #   eas-version: latest
+        #   token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🚀 Create OTA update (Staging)
+        if: needs.define-env.outputs.app_env == 'staging'
+        run: |
+          echo "build to staging"
+
+      - name: 🚀 Create OTA update (Production)
+        if: needs.define-env.outputs.app_env == 'production'
+        run: |
+          echo "build to production"
+
+      # - name: 🚀 Create OTA update (Staging)
+      #   if: ${{ github.event.inputs.channel == 'all' || github.event.inputs.channel == 'staging' }}
+      #   run: EXPO_PUBLIC_APP_ENV=staging eas update --branch staging --message="$(git log -1 --pretty=%B)" --non-interactive && npx sentry-expo-upload-sourcemaps dist
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      # - name: 🚀 Create OTA update (Production)
+      #   if: ${{ github.event.inputs.channel == 'all' || github.event.inputs.channel == 'production' }}
+      #   run: EXPO_PUBLIC_APP_ENV=production eas update --branch production --message="$(git log -1 --pretty=%B)" --non-interactive && npx sentry-expo-upload-sourcemaps dist
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
