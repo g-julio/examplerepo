@@ -72,32 +72,14 @@ jobs:
           curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
           sudo apt-get update && sudo apt-get install -y infisical
 
-      - name: Prepare env
-        env:
-          PROFILE: ${{ needs.define-env.outputs.app_env }}
-        run: |
-          echo '{{$secrets := secret "${{ env.INFISICAL_PROJECT_ID }}" "${{ env.PROFILE }}" "${{ env.INFISICAL_PATH }}"}}
-            {{$length := len $secrets}}
-            {{- "{"}}
-            {{- with $secrets }}
-            {{- range $index, $secret := . }}
-            "{{ $secret.Key }}": "{{ $secret.Value }}"{{if lt $index (minus $length 1)}},{{end}}
-            {{- end }}
-            {{- end }}
-            {{ "}" -}}
-          ' > template
-          export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
-          infisical export --env="staging" --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" > .env
-          infisical export --template="./template" > secrets.json
-          jq \
-            --arg profile "$PROFILE" \
-            --argjson json "$(cat ./secrets.json)" \
-            '.build[$profile].env = $json' eas.json > eas.json.tmp \
-            && mv eas.json.tmp eas.json
-          sed -i '/\*.env/d' .gitignore
-          sed -i 's/"requireCommit": true/"requireCommit": false/' eas.json
-          cat .gitignore
-          cat eas.json
+      - name: Use composite action
+        uses: ./.github/actions/eas-env-setup
+        with:
+          infisical_project_id: ${{ env.INFISICAL_PROJECT_ID }}
+          infisical_path: ${{ env.INFISICAL_PATH }}
+          infisical_client_id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          infisical_client_secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          profile: ${{ needs.define-env.outputs.app_env }}
 
       - name: 🏗 Setup Expo and EAS
         run: echo "expo login"
