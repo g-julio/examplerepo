@@ -50,8 +50,9 @@ jobs:
     needs: define-env
     environment: ${{ needs.define-env.outputs.app_env }}
     env:
-      INFISICAL_PROJECT_ID: xxxx
-      INFISICAL_PATH: /gesture-consumer
+      INFISICAL_PROJECT_ID: 593067cd-5aa1-4860-b02c-42ccc666e20c
+      INFISICAL_PATH: /sub-folder
+      INFISICAL_TOKEN: $(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
@@ -67,12 +68,32 @@ jobs:
       - name: 🏗 Install dependencies
         run: echo "npm ci"
 
-      - name: Install Infisical CLI and login
+      - name: Install Infisical CLI
         run: |
-            echo "infisical login"
+          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
 
-      - name: Allow .env in gitingore so eas can use it
+      - name: Prepare env
+        env:
+          PROFILE: ${{ needs.define-env.outputs.app_env }}
         run: |
+          echo '{{$secrets := secret "$INFISICAL_PROJECT_ID" "$PROFILE" "$INFISICAL_PATH"}}
+            {{$length := len $secrets}}
+            {{- "{"}}
+            {{- with $secrets }}
+            {{- range $index, $secret := . }}
+            "{{ $secret.Key }}": "{{ $secret.Value }}"{{if lt $index (minus $length 1)}},{{end}}
+            {{- end }}
+            {{- end }}
+            {{ "}" -}}
+          ' > template
+          infisical export --env="staging" --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" > .env
+          infisical export --template="./template" > secrets.json
+          jq \
+            --arg profile "$PROFILE" \
+            --argjson json "$(cat ./secrets.json)" \
+            '.build[$profile].env = $json' eas.json > eas.json.tmp \
+            && mv eas.json.tmp eas.json
           sed -i '/\*.env/d' .gitignore
           sed -i 's/"requireCommit": true/"requireCommit": false/' eas.json
           cat .gitignore
