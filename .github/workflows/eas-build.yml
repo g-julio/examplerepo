@@ -76,6 +76,10 @@ jobs:
         env:
           PROFILE: ${{ needs.define-env.outputs.app_env }}
         run: |
+          echo "INFISICAL_PROJECT_ID=${{ env.INFISICAL_PROJECT_ID }}"
+          echo "PROFILE=${{ env.PROFILE }}"
+          echo "INFISICAL_PATH=${{ env.INFISICAL_PATH }}"
+
           echo '{{$secrets := secret "$INFISICAL_PROJECT_ID" "$PROFILE" "$INFISICAL_PATH"}}
             {{$length := len $secrets}}
             {{- "{"}}
