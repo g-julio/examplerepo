@@ -1,0 +1,84 @@
+{
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "channel": "staging",
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "staging"
+      }
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "ios": {
+        "image": "latest"
+      },
+      "android": {
+        "image": "latest"
+      },
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "development"
+      }
+    },
+    "staging": {
+      "channel": "staging",
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest"
+      },
+      "android": {
+        "image": "latest"
+      },
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "staging"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest"
+      },
+      "android": {
+        "image": "latest"
+      },
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "production"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "1421880269",
+        "appleTeamId": "T7J6N9X5GB",
+        "bundleIdentifier": "com.GestureInc.GestureUser",
+        "appleId": "taj@gesture.vip"
+      },
+      "android": {
+        "track": "internal",
+        "applicationId": "com.yourgesture.gestureuser",
+        "changesNotSentForReview": true
+      }
+    },
+    "staging": {
+      "ios": {
+        "ascAppId": "1451227253",
+        "appleTeamId": "T7J6N9X5GB",
+        "bundleIdentifier": "com.GestureInc.GestureUser.dev",
+        "appleId": "taj@gesture.vip"
+      },
+      "android": {
+        "track": "internal",
+        "applicationId": "com.yourgesture.gestureuser",
+        "changesNotSentForReview": true
+      }
+    }
+  },
+  "cli": {
+    "version": ">= 0.44.0",
+    "requireCommit": true,
+    "appVersionSource": "remote"
+  }
+}

@@ -71,6 +71,13 @@ jobs:
         run: |
             echo "infisical login"
 
+      - name: Allow .env in gitingore so eas can use it
+        run: |
+          sed -i '/\*.env/d' .gitignore
+          sed -i 's/"requireCommit": true/"requireCommit": false/' eas.json
+          cat .gitignore
+          cat eas.json
+
       - name: 🏗 Setup Expo and EAS
         run: echo "expo login"
         # uses: expo/expo-github-action@v8
