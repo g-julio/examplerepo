@@ -1,4 +1,5 @@
 name: Update EAS environment
+description: 'Update EAS environment with secrets from Infisical'
 inputs:
   infisical_project_id:
     description: 'INFISICAL_PROJECT_ID'
@@ -47,5 +48,3 @@ runs:
           && mv eas.json.tmp eas.json
         sed -i '/\*.env/d' .gitignore
         sed -i 's/"requireCommit": true/"requireCommit": false/' eas.json
-        cat .gitignore
-        cat eas.json
