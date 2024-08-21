@@ -19,6 +19,7 @@ runs:
   using: 'composite'
   steps:
     - name: Prepare env
+      shell: bash
       env:
         PROFILE: ${{ inputs.profile }}
         INFISICAL_PROJECT_ID: ${{ inputs.infisical_project_id }}
