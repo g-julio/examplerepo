@@ -1,0 +1,50 @@
+name: Update EAS environment
+description: 'Update EAS environment with secrets from Infisical'
+inputs:
+  infisical_project_id:
+    description: 'INFISICAL_PROJECT_ID'
+    required: true
+  infisical_path:
+    description: 'INFISICAL_PATH'
+    required: true
+  infisical_client_id:
+    description: 'INFISICAL_CLIENT_ID'
+    required: true
+  infisical_client_secret:
+    description: 'INFISICAL_CLIENT_SECRET'
+    required: true
+  profile:
+    description: 'eas profile'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepare env
+      shell: bash
+      env:
+        PROFILE: ${{ inputs.profile }}
+        INFISICAL_PROJECT_ID: ${{ inputs.infisical_project_id }}
+        INFISICAL_PATH: ${{ inputs.infisical_path }}
+        INFISICAL_CLIENT_ID: ${{ inputs.infisical_client_id }}
+        INFISICAL_CLIENT_SECRET: ${{ inputs.infisical_client_secret }}
+      run: |
+        echo '{{$secrets := secret "${{ env.INFISICAL_PROJECT_ID }}" "${{ env.PROFILE }}" "${{ env.INFISICAL_PATH }}"}}
+          {{$length := len $secrets}}
+          {{- "{"}}
+          {{- with $secrets }}
+          {{- range $index, $secret := . }}
+          "{{ $secret.Key }}": "{{ $secret.Value }}"{{if lt $index (minus $length 1)}},{{end}}
+          {{- end }}
+          {{- end }}
+          {{ "}" -}}
+        ' > template
+        export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ env.INFISICAL_CLIENT_ID }} --client-secret=${{ env.INFISICAL_CLIENT_SECRET }} --silent --plain)
+        infisical export --env="staging" --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" > .env
+        infisical export --template="./template" > secrets.json
+        jq \
+          --arg profile "$PROFILE" \
+          --argjson json "$(cat ./secrets.json)" \
+          '.build[$profile].env = $json' eas.json > eas.json.tmp \
+          && mv eas.json.tmp eas.json
+        sed -i '/\*.env/d' .gitignore
+        sed -i 's/"requireCommit": true/"requireCommit": false/' eas.json
