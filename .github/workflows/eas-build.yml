@@ -52,7 +52,6 @@ jobs:
     env:
       INFISICAL_PROJECT_ID: 593067cd-5aa1-4860-b02c-42ccc666e20c
       INFISICAL_PATH: /sub-folder
-      INFISICAL_TOKEN: $(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
@@ -87,6 +86,7 @@ jobs:
             {{- end }}
             {{ "}" -}}
           ' > template
+          export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
           infisical export --env="staging" --projectId="${{ env.INFISICAL_PROJECT_ID }}" --path="${{ env.INFISICAL_PATH }}" > .env
           infisical export --template="./template" > secrets.json
           jq \
