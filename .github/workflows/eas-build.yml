@@ -50,8 +50,9 @@ jobs:
     needs: define-env
     environment: ${{ needs.define-env.outputs.app_env }}
     env:
-      INFISICAL_PROJECT_ID: xxxx
-      INFISICAL_PATH: /gesture-consumer
+      INFISICAL_PROJECT_ID: 593067cd-5aa1-4860-b02c-42ccc666e20c
+      INFISICAL_PATH: /sub-folder
+      AUTO_SUBMIT: ${{ github.event.inputs.submit == 'true' && '--auto-submit' || '' }}
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
@@ -67,23 +68,42 @@ jobs:
       - name: 🏗 Install dependencies
         run: echo "npm ci"
 
-      - name: Install Infisical CLI and login
+      - name: Install Infisical CLI
         run: |
-            echo "infisical login"
+          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
 
       - name: 🏗 Setup Expo and EAS
-        run: echo "expo login"
+        run: |
+          echo "expo login"
         # uses: expo/expo-github-action@v8
         # with:
         #   eas-version: latest
         #   token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Update EAS environment
+        uses: ./.github/actions/eas-env-setup
+        with:
+          infisical_project_id: ${{ env.INFISICAL_PROJECT_ID }}
+          infisical_path: ${{ env.INFISICAL_PATH }}
+          infisical_client_id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          infisical_client_secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          profile: ${{ needs.define-env.outputs.app_env }}
+
+      - name: Force auto-submit if required
+        env:
+          TAG_REF: ${{ github.ref }}
+        run: |
+          if [[ "$TAG_REF" == refs/tags/v* ]]; then
+            echo "AUTO_SUBMIT=--auto-submit" >> "$GITHUB_ENV"
+          fi
+
       - name: 🚀 Build app (Staging)
         if: needs.define-env.outputs.app_env == 'staging'
         run: |
-          echo "build to staging"
+          echo "eas build --platform ${{ github.event.inputs.platform }} --profile staging ${{ env.AUTO_SUBMIT }} --non-interactive"
 
       - name: 🚀 Build app (Production)
         if: needs.define-env.outputs.app_env == 'production'
         run: |
-          echo "build to production"
+          echo "eas build --platform ${{ github.event.inputs.platform }} --profile production ${{ env.AUTO_SUBMIT }} --non-interactive"
