@@ -53,6 +53,7 @@ jobs:
       INFISICAL_PROJECT_ID: 593067cd-5aa1-4860-b02c-42ccc666e20c
       INFISICAL_PATH: /sub-folder
       AUTO_SUBMIT: ${{ github.event.inputs.submit == 'true' && '--auto-submit' || '' }}
+      EAS_PLATFORMS: ${{ github.event.inputs.platform && github.event.inputs.platform || 'all' }}
     steps:
       - name: 🏗 Checkout
         uses: actions/checkout@v4
@@ -101,9 +102,9 @@ jobs:
       - name: 🚀 Build app (Staging)
         if: needs.define-env.outputs.app_env == 'staging'
         run: |
-          echo "eas build --platform ${{ github.event.inputs.platform }} --profile staging ${{ env.AUTO_SUBMIT }} --non-interactive"
+          echo "eas build --platform ${{ env.EAS_PLATFORMS }} --profile staging ${{ env.AUTO_SUBMIT }} --non-interactive"
 
       - name: 🚀 Build app (Production)
         if: needs.define-env.outputs.app_env == 'production'
         run: |
-          echo "eas build --platform ${{ github.event.inputs.platform }} --profile production ${{ env.AUTO_SUBMIT }} --non-interactive"
+          echo "eas build --platform ${{ env.EAS_PLATFORMS }} --profile production ${{ env.AUTO_SUBMIT }} --non-interactive"
