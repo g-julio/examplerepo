@@ -5,7 +5,7 @@ on:
     types: [published]
   push:
     branches:
-      - staging
+      - '*'
 
 jobs:
   staging-deploy:
