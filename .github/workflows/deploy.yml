@@ -44,6 +44,7 @@ jobs:
 
       - name: Build
         run: |
+          cat .env
           echo "npm run build"
 
       - name: Install Firebase Tools
