@@ -70,6 +70,8 @@ jobs:
         run: |
           firebase use ${{ env.FIREBASE_PROJECT_ID }}
           firebase deploy --only hosting:${{ env.TARGET }}
+          curl -X PUT https://us-central1-gesture-dev.cloudfunctions.net/inngest
+
 
   production-deploy:
     if: startsWith(github.ref, 'refs/tags/v') && (github.event.base_ref == 'refs/heads/production' || github.event.release.target_commitish == 'production')
