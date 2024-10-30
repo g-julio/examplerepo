@@ -70,7 +70,7 @@ jobs:
         run: |
           firebase use ${{ env.FIREBASE_PROJECT_ID }}
           firebase deploy --only hosting:${{ env.TARGET }}
-          curl -X PUT https://us-central1-gesture-dev.cloudfunctions.net/inngest
+          curl -sS --fail -X PUT https://us-central1-gesture-dev.cloudfunctions.net/inngest
 
 
   production-deploy:
