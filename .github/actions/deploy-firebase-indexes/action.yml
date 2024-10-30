@@ -23,12 +23,4 @@ runs:
     - name: Deploy Firestore Indexes
       shell: expect
       run: |
-          #!/usr/bin/expect
-          cd ${{ inputs.path }}
-          spawn firebase deploy --project=${{ inputs.project }} --only firestore:indexes
-          expect {
-              "Would you like to delete these indexes? Selecting no will continue the rest of the deployment" {
-                  send "N\r"
-                  interact
-              }
-          }
+        ./.github/actions/deploy-firebase-indexes/script.sh ${{ inputs.project }} ${{ inputs.path }}
