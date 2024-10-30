@@ -21,6 +21,6 @@ runs:
           fi
 
     - name: Deploy Firestore Indexes
-      shell: expect
+      shell: bash
       run: |
-        ./.github/actions/deploy-firebase-indexes/script.sh ${{ inputs.project }} ${{ inputs.path }}
+        expect ./.github/actions/deploy-firebase-indexes/script.sh ${{ inputs.project }} ${{ inputs.path }}
