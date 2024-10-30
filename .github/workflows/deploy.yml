@@ -58,6 +58,14 @@ jobs:
           project: ${{ env.FIREBASE_PROJECT_ID }}
           path: './gesture-firebase'
 
+
+      - name: Deploy firebase indexes 2
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        uses: ./.github/actions/deploy-firebase-indexes
+        with:
+          project: ${{ env.FIREBASE_PROJECT_ID }}
+          path: './gesture-firebase'
+
       - name: Firebase Deploy
         run: |
           firebase use ${{ env.FIREBASE_PROJECT_ID }}
