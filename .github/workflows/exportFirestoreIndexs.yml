@@ -35,15 +35,15 @@ jobs:
 
       - name: Configure git
         run: |
-            echo: "Running step"
+          echo "Running step"
 
       - name: Pull latest changes
         run: |
-            echo: "Running step"
+          echo "Running step"
 
       - name: Export Gesture Firebase Firestore Indexes
         run: |
-            echo: "Running step"
+          echo "Running step"
         
       - name: Gesture Firebase User Google Auth
         # uses: google-github-actions/auth@v2
@@ -53,7 +53,7 @@ jobs:
             
       - name: Export Gesture Firebase User Firestore Indexes
         run: |
-            echo: "Running step"
+          echo "Running step"
 
       - name: Check If Firestore Index Files Have Changed
         id: git_status
