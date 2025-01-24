@@ -2,6 +2,8 @@ name: Linting and Unit Testing
 
 on:
   pull_request:
+    branches-ignore:
+      - production
   workflow_dispatch:
   workflow_call:
     inputs:
