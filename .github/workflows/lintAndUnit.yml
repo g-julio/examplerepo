@@ -28,32 +28,32 @@ jobs:
         run: echo "Login in docker"
 
       - name: Start Containers
-        run: echo "docker compose up -d --scale gesture-firebase-compiler=0 --scale gesture-firebase-user-compiler=0"
+        run: echo "Doing Step"
 
       # Gesture Firebase
 
       - name: Install Gesture Firebase dependencies
-        run: echo "docker compose exec gesture-firebase sh -c "cd functions && npm i""
+        run: echo "Doing Step"
 
       - name: Compile Gesture Firebase Typescript
-        run: echo "docker compose exec gesture-firebase sh -c "cd functions && npx tsc""
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase ESLint
-        run: echo "docker compose exec gesture-firebase sh -c "cd functions && npm run lint""
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase Unit Tests
-        run: echo "docker compose exec gesture-firebase sh -c "cd functions && npm test""
+        run: echo "Doing Step"
 
       # Gesture Firebase User
 
       - name: Install Gesture Firebase User dependencies
-        run: echo "docker compose exec gesture-firebase-user sh -c "cd functions && npm i""
+        run: echo "Doing Step"
 
       - name: Compile Gesture Firebase User Typescript
-        run: echo "docker compose exec gesture-firebase-user sh -c "cd functions && npx tsc""
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase User ESLint
-        run: echo "docker compose exec gesture-firebase-user sh -c "cd functions && npm run lint""
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase User Unit Tests
-        run: echo "docker compose exec gesture-firebase-user sh -c "cd functions && npm test""
+        run: echo "Doing Step"
