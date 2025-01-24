@@ -51,12 +51,12 @@ jobs:
 
       - name: Install Gesture Firebase Dependencies
         run: |
-          cd gesture-firebase/functions
+          cd gesture-firebase
           npm install
 
       - name: Install Gesture Firebase User Dependencies
         run: |
-          cd gesture-firebase-user/functions
+          cd gesture-firebase-user
           npm install
 
       - name: Install Firebase Tools
@@ -64,8 +64,7 @@ jobs:
 
       - name: Install Infisical CLI
         run: |
-          echo "curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash"
-          echo "sudo apt-get update && sudo apt-get install -y infisical"
+          echo "Doing step"
 
       - name: Login to Infisical and export envs
         run: |
@@ -91,7 +90,7 @@ jobs:
         # Deploy only on push to staging or when gesture-firebase is selected or all projects is selected
         if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
         run: |
-          cd gesture-firebase/functions
+          cd gesture-firebase
           echo "firebase deploy --project=gesture-dev --only functions:businessV2,functions:crm,functions:events,functions:grunnerv3,functions:merchants,functions:life,functions:nina,functions:SmartSend,functions:social,functions:social_legacy,functions:gservices_3,functions:vendors,functions:backups,functions:service_merchant_tasks,functions:service_merchant_user,functions:service_nina_3,functions:service_business_group_orders,functions:service_business_orders,functions:service_business_users,functions:service_grunner_users,functions:service_grunner_tasks,functions:service_vendor_users,functions:service_vendor_order,functions:db_backup,functions:copy_backups_to_s3,functions:rotate_infisical_variables,functions:service_consumer_users_location_history_oncreate,functions:export_grunners_to_csv,functions:inngest,functions:stripe"
 
       - name: Sync Inngest Main
@@ -119,7 +118,7 @@ jobs:
         # Deploy only push to staging or when gesture-firebase-user is selected or all projects is selected
         if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
         run: |
-          cd gesture-firebase-user/functions
+          cd gesture-firebase-user
           echo "firebase deploy --project=gesture-dev-2 --only functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest"
 
       - name: Sync Inngest User
@@ -154,14 +153,14 @@ jobs:
         # Run only on tagged release or when gesture-firebase is selected or all projects is selected
         if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
         run: |
-          cd gesture-firebase/functions
+          cd gesture-firebase
           npm install
 
       - name: Install Gesture Firebase User Dependencies
         # Run only on tagged release or when gesture-firebase-user is selected or all projects is selected
         if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
         run: |
-          cd gesture-firebase-user/functions
+          cd gesture-firebase-user
           npm install
 
       - name: Install Firebase Tools
@@ -195,7 +194,7 @@ jobs:
         # Deploy only on tagged release or when gesture-firebase is selected or all projects is selected
         if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
         run: |
-          echo "cd gesture-firebase/functions"
+          echo "cd gesture-firebase"
           echo "firebase deploy --project=yourgestureapp --only functions:businessV2,functions:crm,functions:events,functions:grunnerv3,functions:merchants,functions:life,functions:nina,functions:SmartSend,functions:social,functions:gservices_3,functions:vendors,functions:backups,functions:service_merchant_tasks,functions:service_merchant_user,functions:service_nina_3,functions:service_business_group_orders,functions:service_business_orders,functions:service_business_users,functions:service_grunner_users,functions:service_grunner_tasks,functions:service_vendor_users,functions:service_vendor_order,functions:db_backup,functions:copy_backups_to_s3,functions:rotate_infisical_variables,functions:service_consumer_users_location_history_oncreate,functions:export_grunners_to_csv,functions:inngest,functions:stripe"
 
       - name: Sync Inngest Main
@@ -223,7 +222,7 @@ jobs:
         # Deploy only on tagged release or when gesture-firebase-user is selected or all projects is selected
         if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
         run: |
-          echo "cd gesture-firebase-user/functions"
+          echo "cd gesture-firebase-user"
           echo "firebase deploy --project=gesture-user --only functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest"
 
       - name: Sync Inngest User
