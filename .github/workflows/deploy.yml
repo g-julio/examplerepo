@@ -34,6 +34,14 @@ jobs:
       source: ${{ github.event_name }}
       reference: ${{ github.event.release.tag_name || github.ref_name }}
 
+  indexes:
+    if: (startsWith(github.ref, 'refs/heads/staging')) || (github.event.inputs.environment == 'all' || github.event.inputs.environment == 'staging')
+    needs: lint
+    uses: ./.github/workflows/exportFirestoreIndexs.yml
+    with:
+      source: ${{ github.event_name }}
+      reference: ${{ github.event.release.tag_name || github.ref_name }}
+
   staging-deploy:
     needs: lint
     # Deploy only on pushes to the staging branch or when manually triggered and the staging branch is selected or all environments is selected
