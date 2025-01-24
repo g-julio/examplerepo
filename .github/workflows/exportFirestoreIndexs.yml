@@ -1,0 +1,66 @@
+name: Export Firestore Indexes
+
+on:
+  workflow_call:
+    inputs:
+      source:
+        required: true
+        type: string
+      reference:
+        required: false
+        type: string
+
+jobs:
+  export-firestore-indexes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Ensure the workflow has write permissions to the repository
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: echo "npm install -g firebase-tools"
+        
+      - name: Gesture Firebase Google Auth
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   credentials_json: ${{ secrets.STAGING_GESTURE_FIREBASE_SA_KEY }}
+        run: echo "use google-github-actions/auth@v2"
+
+      - name: Configure git
+        run: |
+          echo "Running step"
+
+      - name: Pull latest changes
+        run: |
+          echo "Running step"
+
+      - name: Export Gesture Firebase Firestore Indexes
+        run: |
+          echo "Running step"
+        
+      - name: Gesture Firebase User Google Auth
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   credentials_json: ${{ secrets.STAGING_GESTURE_FIREBASE_USER_SA_KEY }}
+        run: echo "use google-github-actions/auth@v2"
+            
+      - name: Export Gesture Firebase User Firestore Indexes
+        run: |
+          echo "Running step"
+
+      - name: Check If Firestore Index Files Have Changed
+        id: git_status
+        run: |
+          echo "Running step"
+
+      - name: Commit Firestore Indexes
+        if: env.changed == 'true'
+        run: |
+          echo "Running step"
