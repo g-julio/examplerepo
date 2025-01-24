@@ -12,6 +12,6 @@
   "license": "ISC",
   "devDependencies": {
     "semantic-release": "^19.0.5",
-    "semantic-release-npm-github-publish": "^1.5.4"
+    "semantic-release-npm-github-publish": "1.5.4"
   }
 }
