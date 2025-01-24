@@ -36,8 +36,10 @@ jobs:
 
   indexes:
     if: (startsWith(github.ref, 'refs/heads/staging')) || (github.event.inputs.environment == 'all' || github.event.inputs.environment == 'staging')
-    needs: lint
     uses: ./.github/workflows/exportFirestoreIndexs.yml
+    needs: lint
+    permissions:
+      contents: write
     with:
       source: ${{ github.event_name }}
       reference: ${{ github.event.release.tag_name || github.ref_name }}
