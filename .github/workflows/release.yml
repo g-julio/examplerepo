@@ -7,8 +7,10 @@ on:
 
 jobs:
   semantic-release:
-    permissions: write-all
-      
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub App Token
@@ -33,4 +35,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm ci && npx semantic-release
+          cd gesture-firebase/functions && npm ci && npx semantic-release
+
+      - name: Gesture Firebase User release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd gesture-firebase-user/functions && npm ci && npx semantic-release

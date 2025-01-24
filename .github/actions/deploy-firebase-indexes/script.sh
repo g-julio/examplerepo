@@ -14,7 +14,7 @@ proc wait_for_deployment {attempts} {
         exit 1
     }
     expect {
-        "Would you like to delete these indexes? Selecting no will continue the rest of the deployment" {
+        "Would you like to delete" {
             send "N\r"
             interact
         }
