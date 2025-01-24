@@ -1,0 +1,231 @@
+name: Firebase Deploy
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select environment to deploy"
+        required: true
+        type: choice
+        default: "all"
+        options:
+          - "all"
+          - "staging"
+          - "production"
+      project:
+        description: "Select project to deploy"
+        required: true
+        type: choice
+        default: "all"
+        options:
+          - "all"
+          - "gesture-firebase"
+          - "gesture-firebase-user"
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lintAndUnit.yml
+    with:
+      source: ${{ github.event_name }}
+      reference: ${{ github.event.release.tag_name || github.ref_name }}
+
+  staging-deploy:
+    needs: lint
+    # Deploy only on pushes to the staging branch or when manually triggered and the staging branch is selected or all environments is selected
+    if: (startsWith(github.ref, 'refs/heads/staging')) || (github.event.inputs.environment == 'all' || github.event.inputs.environment == 'staging')
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Gesture Firebase Dependencies
+        run: |
+          cd gesture-firebase
+          npm install
+
+      - name: Install Gesture Firebase User Dependencies
+        run: |
+          cd gesture-firebase-user
+          npm install
+
+      - name: Install Firebase Tools
+        run: echo "npm install -g firebase-tools"
+
+      - name: Install Infisical CLI
+        run: |
+          echo "Doing step"
+
+      - name: Login to Infisical and export envs
+        run: |
+          echo "login infisical"
+
+      - name: Gesture Firebase Google Auth
+        # Run only on push to staging or when gesture-firebase is selected or all projects is selected
+        if: (startsWith(github.ref, 'refs/heads/staging')) ||github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   credentials_json: ${{ secrets.GESTURE_FIREBASE_SA_KEY }}
+        run: echo "uses google-github-actions/auth@v2"
+
+      - name: Deploy firebase indexes
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        # uses: ./.github/actions/deploy-firebase-indexes
+        # with:
+        #   project: "gesture-dev"
+        #   path: "./gesture-firebase/functions"
+        run: echo "Deploy firebase indexes"
+
+      - name: Deploy Staging Gesture Firebase Functions
+        # Deploy only on push to staging or when gesture-firebase is selected or all projects is selected
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          cd gesture-firebase
+          echo "firebase deploy --project=gesture-dev --only functions:businessV2,functions:crm,functions:events,functions:grunnerv3,functions:merchants,functions:life,functions:nina,functions:SmartSend,functions:social,functions:social_legacy,functions:gservices_3,functions:vendors,functions:backups,functions:service_merchant_tasks,functions:service_merchant_user,functions:service_nina_3,functions:service_business_group_orders,functions:service_business_orders,functions:service_business_users,functions:service_grunner_users,functions:service_grunner_tasks,functions:service_vendor_users,functions:service_vendor_order,functions:db_backup,functions:copy_backups_to_s3,functions:rotate_infisical_variables,functions:service_consumer_users_location_history_oncreate,functions:export_grunners_to_csv,functions:inngest,functions:stripe"
+
+      - name: Sync Inngest Main
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          echo "Sync inngest main"
+
+      - name: Gesture Firebase User Google Auth
+        # Run only on push to staging or when gesture-firebase-user is selected or all projects is selected
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   credentials_json: ${{ secrets.GESTURE_FIREBASE_USER_SA_KEY }}
+        run: echo "use google-github-actions/auth@v2"
+
+      - name: Deploy firebase indexes
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        # uses: ./.github/actions/deploy-firebase-indexes
+        # with:
+        #   project: "gesture-dev-2"
+        #   path: "./gesture-firebase-user/functions"
+        run: echo "Deploy firebase indexes"
+
+      - name: Deploy Staging Gesture Firebase User Functions
+        # Deploy only push to staging or when gesture-firebase-user is selected or all projects is selected
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        run: |
+          cd gesture-firebase-user
+          echo "firebase deploy --project=gesture-dev-2 --only functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest"
+
+      - name: Sync Inngest User
+        if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        run: |
+          echo "Sync inngest user"
+
+  production-deploy:
+    needs: lint
+    # Deploy only on tagged releases to the production branch or when manually triggered and the production branch is selected or all environments is selected
+    if: >
+      (
+        (startsWith(github.ref, 'refs/tags/gesture-firebase') || 
+        startsWith(github.ref, 'refs/tags/gesture-firebase-user')) &&
+        (github.event.base_ref == 'refs/heads/production' ||
+        github.event.release.target_commitish == 'production')
+      ) || 
+      github.event.inputs.environment == 'all' || 
+      github.event.inputs.environment == 'production'
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Gesture Firebase Dependencies
+        # Run only on tagged release or when gesture-firebase is selected or all projects is selected
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          cd gesture-firebase
+          npm install
+
+      - name: Install Gesture Firebase User Dependencies
+        # Run only on tagged release or when gesture-firebase-user is selected or all projects is selected
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        run: |
+          cd gesture-firebase-user
+          npm install
+
+      - name: Install Firebase Tools
+        run: echo "npm install -g firebase-tools"
+
+      - name: Install Infisical CLI
+        run: |
+          echo "Install infisical cli"
+
+      - name: Login to Infisical and export envs
+        run: |
+          echo "login infisical"
+
+      - name: Gesture Firebase Google Auth
+        # Run only on tagged release or when gesture-firebase is selected or all projects is selected
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   credentials_json: ${{ secrets.GESTURE_FIREBASE_SA_KEY }}
+        run: echo "uses google-github-actions/auth@v2"
+
+      - name: Deploy firebase indexes
+        # if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        # uses: ./.github/actions/deploy-firebase-indexes
+        # with:
+        #   project: "yourgestureapp"
+        #   path: "./gesture-firebase/functions"
+        run: echo "Deploy firebase indexes"
+
+      - name: Deploy Production Gesture Firebase Functions
+        # Deploy only on tagged release or when gesture-firebase is selected or all projects is selected
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          echo "cd gesture-firebase"
+          echo "firebase deploy --project=yourgestureapp --only functions:businessV2,functions:crm,functions:events,functions:grunnerv3,functions:merchants,functions:life,functions:nina,functions:SmartSend,functions:social,functions:gservices_3,functions:vendors,functions:backups,functions:service_merchant_tasks,functions:service_merchant_user,functions:service_nina_3,functions:service_business_group_orders,functions:service_business_orders,functions:service_business_users,functions:service_grunner_users,functions:service_grunner_tasks,functions:service_vendor_users,functions:service_vendor_order,functions:db_backup,functions:copy_backups_to_s3,functions:rotate_infisical_variables,functions:service_consumer_users_location_history_oncreate,functions:export_grunners_to_csv,functions:inngest,functions:stripe"
+
+      - name: Sync Inngest Main
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-v') || github.event.inputs.project == 'gesture-firebase' || github.event.inputs.project == 'all'
+        run: |
+          echo "Sync inngest main"
+
+      - name: Gesture Firebase User Google Auth
+        # Run only on tagged release or when gesture-firebase-user is selected or all projects is selected
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   credentials_json: ${{ secrets.GESTURE_FIREBASE_USER_SA_KEY }}
+        run: echo "use google-github-actions/auth@v2"
+
+      - name: Deploy firebase indexes
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        # uses: ./.github/actions/deploy-firebase-indexes
+        # with:
+        #   project: "gesture-user"
+        #   path: "./gesture-firebase-user/functions"
+        run: echo "Deploy firebase indexes"
+
+      - name: Deploy Production Gesture Firebase User Functions
+        # Deploy only on tagged release or when gesture-firebase-user is selected or all projects is selected
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        run: |
+          echo "cd gesture-firebase-user"
+          echo "firebase deploy --project=gesture-user --only functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest"
+
+      - name: Sync Inngest User
+        if: startsWith(github.ref, 'refs/tags/gesture-firebase-user-v') || github.event.inputs.project == 'gesture-firebase-user' || github.event.inputs.project == 'all'
+        run: |
+          echo "Sync inngest user"
