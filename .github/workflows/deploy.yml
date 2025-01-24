@@ -129,15 +129,7 @@ jobs:
   production-deploy:
     needs: lint
     # Deploy only on tagged releases to the production branch or when manually triggered and the production branch is selected or all environments is selected
-    if: >
-      (
-        (startsWith(github.ref, 'refs/tags/gesture-firebase') || 
-        startsWith(github.ref, 'refs/tags/gesture-firebase-user')) &&
-        (github.event.base_ref == 'refs/heads/production' ||
-        github.event.release.target_commitish == 'production')
-      ) || 
-      github.event.inputs.environment == 'all' || 
-      github.event.inputs.environment == 'production'
+    if: startsWith(github.ref, 'refs/tags/v') && (github.event.base_ref == 'refs/heads/production' || github.event.release.target_commitish == 'production')
     environment: production
     runs-on: ubuntu-latest
     steps:
