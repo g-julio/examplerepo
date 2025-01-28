@@ -1,14 +1,18 @@
 name: Export Firestore Indexes
 
 on:
-  pull_request:
-    branches:
-      - staging
+  workflow_call:
+    inputs:
+      source:
+        required: true
+        type: string
+      reference:
+        required: false
+        type: string
 
 jobs:
   export-firestore-indexes:
     runs-on: ubuntu-latest
-    environment: staging
     permissions:
       contents: write  # Ensure the workflow has write permissions to the repository
     steps:
@@ -21,42 +25,42 @@ jobs:
           node-version: '20'
 
       - name: Install Firebase CLI
-        run: echo "Installed firebase tool" # npm install -g firebase-tools
+        run: echo "npm install -g firebase-tools"
         
       - name: Gesture Firebase Google Auth
         # uses: google-github-actions/auth@v2
         # with:
-        #   credentials_json: ${{ secrets.GESTURE_FIREBASE_SA_KEY }}
-        run: echo "Gesture Firebase Google Auth"
+        #   credentials_json: ${{ secrets.STAGING_GESTURE_FIREBASE_SA_KEY }}
+        run: echo "use google-github-actions/auth@v2"
 
       - name: Configure git
         run: |
-          echo "Configuring git"
+          echo "Running step"
 
       - name: Pull latest changes
         run: |
-          echo "Pulling latest changes"
+          echo "Running step"
 
       - name: Export Gesture Firebase Firestore Indexes
         run: |
-          echo "Exported Gesture Firebase Firestore Indexes"
+          echo "Running step"
         
       - name: Gesture Firebase User Google Auth
         # uses: google-github-actions/auth@v2
         # with:
-        #   credentials_json: ${{ secrets.GESTURE_FIREBASE_USER_SA_KEY }}
-        run: echo "Gesture Firebase User Google Auth"
+        #   credentials_json: ${{ secrets.STAGING_GESTURE_FIREBASE_USER_SA_KEY }}
+        run: echo "use google-github-actions/auth@v2"
             
       - name: Export Gesture Firebase User Firestore Indexes
         run: |
-          echo "Exported Gesture Firebase User Firestore Indexes"
+          echo "Running step"
 
       - name: Check If Firestore Index Files Have Changed
         id: git_status
         run: |
-          echo "Checking if Firestore Index Files Have Changed"
+          echo "Running step"
 
       - name: Commit Firestore Indexes
-        # if: env.changed == 'true'
+        if: env.changed == 'true'
         run: |
-          echo "Committed Firestore Indexes"
+          echo "Running step"

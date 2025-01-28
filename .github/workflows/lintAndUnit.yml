@@ -1,9 +1,18 @@
 name: Linting and Unit Testing
 
 on:
-  push:
-    branches: '*'
+  pull_request:
+    branches-ignore:
+      - production
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      source:
+        required: true
+        type: string
+      reference:
+        required: false
+        type: string
 
 jobs:
   lint:
@@ -18,35 +27,35 @@ jobs:
         # with:
         #   username: ${{ secrets.DOCKER_USERNAME }}
         #   password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-        run: echo "Logged in to Docker Hub"
+        run: echo "Login in docker"
 
       - name: Start Containers
-        run: echo "Started Containers"
+        run: echo "Doing Step"
 
       # Gesture Firebase
 
       - name: Install Gesture Firebase dependencies
-        run: echo "Install Gesture Firebase dependencies"
+        run: echo "Doing Step"
 
       - name: Compile Gesture Firebase Typescript
-        run: echo "Compile Gesture Firebase Typescript"
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase ESLint
-        run: echo "Run Gesture Firebase ESLint"
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase Unit Tests
-        run: echo "Run Gesture Firebase Unit Tests"
+        run: echo "Doing Step"
 
       # Gesture Firebase User
 
       - name: Install Gesture Firebase User dependencies
-        run: echo "Install Gesture Firebase User dependencies"
+        run: echo "Doing Step"
 
       - name: Compile Gesture Firebase User Typescript
-        run: echo "Compile Gesture Firebase User Typescript"
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase User ESLint
-        run: echo "Run Gesture Firebase User ESLint"
+        run: echo "Doing Step"
 
       - name: Run Gesture Firebase User Unit Tests
-        run: echo "Run Gesture Firebase User Unit Tests"
+        run: echo "Doing Step"

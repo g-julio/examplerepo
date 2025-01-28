@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `functions` directory
+    directory: "/functions/"
+    # Check the npm registry for updates every week
+    schedule:
+      interval: "weekly"
+    # Limit the number of open pull requests to 2
+    open-pull-requests-limit: 2
+    # Create a group of dependencies to be updated together in one pull request
+    groups:
+      eslint:
+        applies-to: version-updates
+        patterns:
+          - "eslint"
+          - "eslint-*"
+        update-types:
+          - "minor"
+          - "patch"
