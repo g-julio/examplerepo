@@ -27,6 +27,10 @@ on:
           - "gesture-firebase"
           - "gesture-firebase-user"
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.event.release.target_commitish || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     uses: ./.github/workflows/lintAndUnit.yml
