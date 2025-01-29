@@ -13,6 +13,11 @@ on:
       reference:
         required: false
         type: string
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_ACCESS_TOKEN:
+        required: true
 
 jobs:
   lint:
@@ -30,32 +35,32 @@ jobs:
         run: echo "Login in docker"
 
       - name: Start Containers
-        run: echo "Doing Step"
+        run: docker compose up -d --scale gesture-firebase-compiler=0 --scale gesture-firebase-user-compiler=0
 
       # Gesture Firebase
 
       - name: Install Gesture Firebase dependencies
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase sh -c "cd functions && npm i"
 
       - name: Compile Gesture Firebase Typescript
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase sh -c "cd functions && npx tsc"
 
       - name: Run Gesture Firebase ESLint
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase sh -c "cd functions && npm run lint"
 
       - name: Run Gesture Firebase Unit Tests
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase sh -c "cd functions && npm test"
 
       # Gesture Firebase User
 
       - name: Install Gesture Firebase User dependencies
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase-user sh -c "cd functions && npm i"
 
       - name: Compile Gesture Firebase User Typescript
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase-user sh -c "cd functions && npx tsc"
 
       - name: Run Gesture Firebase User ESLint
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase-user sh -c "cd functions && npm run lint"
 
       - name: Run Gesture Firebase User Unit Tests
-        run: echo "Doing Step"
+        run: docker compose exec gesture-firebase-user sh -c "cd functions && npm test"
