@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
       - name: Start Containers
-        run: docker compose up -d --scale gesture-firebase-compiler=0 --scale gesture-firebase-user-compiler=0
+        run: docker compose up -d --scale gesture-firebase-compiler=0 --scale gesture-firebase-user-compiler=0 --scale inngest=0
 
       # Gesture Firebase
 
