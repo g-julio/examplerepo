@@ -1,29 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
     "outDir": "dist",
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2022",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types", "./node_modules/**/*.d.ts"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "rootDir": "src",
+    "module": "CommonJS",
+    "target": "ES6",
+    "strict": true
   },
-  "compileOnSave": true,
-  "include": ["./**/*.ts", "./**/*.js", "./**/*.json"],
-  "exclude": [
-    "dist",
-    "package.json",
-    "package-lock.json",
-    "tsconfig.json",
-    "tsconfig.dev.json",
-    "node_modules",
-    "**/*.spec.js"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
