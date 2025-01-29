@@ -1,0 +1,7 @@
+{
+  "no-discovery": true,
+  "sdk-url": [
+      "http://gesture-firebase:5000/gesture-dev/us-central1/inngest",
+      "http://gesture-firebase-user:5000/gesture-dev-2/us-central1/inngest"
+    ]
+}
