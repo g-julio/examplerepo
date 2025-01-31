@@ -6,6 +6,10 @@ on:
       - production
   workflow_dispatch:
   workflow_call:
+    outputs:
+      key:
+        description: 'Cache key for the current branch'
+        value: ${{ jobs.lint.outputs.cache-key }}
     inputs:
       source:
         required: true
@@ -13,11 +17,6 @@ on:
       reference:
         required: false
         type: string
-    secrets:
-      DOCKER_USERNAME:
-        required: true
-      DOCKER_ACCESS_TOKEN:
-        required: true
 
 env:
   NODE_VERSION: 20
@@ -33,6 +32,8 @@ jobs:
     env:
       PROJECT_PATH: ${{ matrix.project }}/functions
     name: Lint and Test for ${{ matrix.project }}
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.CACHE_KEY }}
 
     steps:
       - name: Checkout code
@@ -43,14 +44,19 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Define cache key
+        id: cache-key
+        env:
+          PACKAGE_LOCK_PATH: ${{ env.PROJECT_PATH }}/package-lock.json
+          CACHE_KEY: ${{ matrix.project }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
+        run: echo "::set-output name=CACHE_KEY::${{ env.CACHE_KEY }}"
+
       - name: Cache node_modules
         id: dependencies-cache
         uses: actions/cache@v4
-        env:
-          PACKAGE_LOCK_PATH: ${{ env.PROJECT_PATH }}/package-lock.json
         with:
           path: ${{ env.PROJECT_PATH }}/node_modules
-          key: ${{ matrix.project }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
+          key: ${{ steps.cache-key.outputs.CACHE_KEY }}
 
       - name: Install dependencies
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
