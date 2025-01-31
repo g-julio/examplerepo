@@ -1,0 +1,132 @@
+version: "3.8"
+
+services:
+  gesture-firebase-compiler:
+    command: sh -c "rm -fr dist && npm install && npx swc src -D -d dist -w"
+    entrypoint: ""
+    container_name: gesture-firebase-compiler
+    image: gesturevip/firebase-node20:1.1.7
+    tty: true
+    volumes:
+      - ./gesture-firebase/functions:/opt/gesture/functions
+    working_dir: /opt/gesture/functions
+    networks:
+      - gesture-local-network
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./functions/package.json
+    #       target: /opt/gesture/functions/package.json
+
+  gesture-firebase-user-compiler:
+    command: sh -c "rm -fr dist && npm install && npx swc src -D -d dist -w"
+    entrypoint: ""
+    container_name: gesture-firebase-user-compiler
+    image: gesturevip/firebase-node20:1.1.7
+    tty: true
+    volumes:
+      - ./gesture-firebase-user/functions:/opt/gesture/functions
+    working_dir: /opt/gesture/functions
+    networks:
+      - gesture-local-network
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./functions/package.json
+    #       target: /opt/gesture/functions/package.json
+
+  gesture-firebase:
+    depends_on:
+      - gesture-firebase-compiler
+    image: gesturevip/firebase-node20:1.1.7
+    container_name: gesture-firebase
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /opt/gesture/functions/src/env/keys/main-dev-sa.json
+    ports:
+      # Gesture Firebase Ports
+      - "4000:4000" # Firebase local UI port
+      - "4400:4400" # Firebase emulator hub
+      - "4500:4500" # Reserved 1
+      - "5001:5001" # Functions emulator
+      - "8080:8080" # Firestore emulator
+      - "8085:8085" # Pubsub emulator
+      - "9000:9000" # Database emulator
+      - "9005:9005" # Firebase auth callback port
+      - "9150:9150" # Reserved 2
+      - "9099:9099" # Auth emulator
+      - "9199:9199" # Storage emulator
+      - "9299:9299" # Eventarc emulator
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./gesture-firebase:/opt/gesture
+      - gesture_firebase_cache:/root/.cache/firebase
+    networks:
+      - gesture-local-network
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: ./src
+    #       target: /opt/gesture/functions/src
+    #       ignore:
+    #         - node_modules
+
+  gesture-firebase-user:
+    depends_on:
+      - gesture-firebase-user-compiler
+    image: gesturevip/firebase-node20:1.1.7
+    container_name: gesture-firebase-user
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /opt/gesture/functions/src/env/keys/user-dev-sa.json
+    ports:
+      # Gesture Firebase User Ports
+      - "14000:14000" # Firebase local UI port
+      - "14400:14400" # Firebase emulator hub
+      - "14500:14500" # Reserved 1
+      - "15001:15001" # Functions emulator
+      - "18080:18080" # Firestore emulator
+      - "18085:18085" # Pubsub emulator
+      - "19000:19000" # Database emulator
+      - "19150:19150" # Reserved 2
+      - "19099:19099" # Auth emulator
+      - "19199:19199" # Storage emulator
+      - "19299:19299" # Eventarc emulator
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./gesture-firebase-user:/opt/gesture
+      - gesture_firebase_user_cache:/root/.cache/firebase
+    networks:
+      - gesture-local-network
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: ./src
+    #       target: /opt/gesture/functions/src
+    #       ignore:
+    #         - node_modules
+
+  inngest:
+    image: inngest/inngest:v1.1.0
+    container_name: inngest
+    depends_on:
+      - gesture-firebase
+      - gesture-firebase-user
+    command: "inngest dev"
+    ports:
+      - 8288:8288
+    networks:
+      - gesture-local-network
+    volumes:
+      - type: bind
+        source: ./inngest.json
+        target: /inngest.json
+
+volumes:
+  gesture_firebase_cache:
+  gesture_firebase_user_cache:
+
+networks:
+  gesture-local-network:
+    name: gesture-local
+    driver: bridge
