@@ -31,7 +31,7 @@ jobs:
           - gesture-firebase
           - gesture-firebase-user
     env:
-      PATH: ${{ matrix.project }}/functions
+      PROJECT_PATH: ${{ matrix.project }}/functions
     name: Lint and Test for ${{ matrix.project }}
 
     steps:
@@ -47,20 +47,20 @@ jobs:
         id: dependencies-cache
         uses: actions/cache@v4
         env:
-          PACKAGE_LOCK_PATH: ${{ env.PATH }}/package-lock.json
+          PACKAGE_LOCK_PATH: ${{ env.PROJECT_PATH }}/package-lock.json
         with:
-          path: ${{ env.PATH }}/node_modules
+          path: ${{ env.PROJECT_PATH }}/node_modules
           key: main-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
 
       - name: Install Gesture Firebase dependencies
         if: steps.main-dependencies.outputs.cache-hit != 'true'
-        run: cd ${{ env.PATH }} && npm i
+        run: cd ${{ env.PROJECT_PATH }} && npm i
 
       - name: Compile Gesture Firebase Typescript
-        run: cd ${{ env.PATH }} && npx tsc
+        run: cd ${{ env.PROJECT_PATH }} && npx tsc
 
       - name: Run Gesture Firebase ESLint
-        run: cd ${{ env.PATH }} && npm run lint
+        run: cd ${{ env.PROJECT_PATH }} && npm run lint
 
       - name: Run Gesture Firebase Unit Tests
-        run: cd ${{ env.PATH }} && npm test
+        run: cd ${{ env.PROJECT_PATH }} && npm test
