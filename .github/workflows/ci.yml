@@ -50,7 +50,7 @@ jobs:
           PACKAGE_LOCK_PATH: ${{ env.PROJECT_PATH }}/package-lock.json
         with:
           path: ${{ env.PROJECT_PATH }}/node_modules
-          key: main-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
+          key: ${{ matrix.project }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
 
       - name: Install dependencies
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
