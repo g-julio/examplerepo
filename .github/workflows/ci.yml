@@ -21,12 +21,18 @@ on:
 
 env:
   NODE_VERSION: 20
-  MAIN_PATH: gesture-firebase/functions
-  USER_PATH: gesture-firebase-user/functions
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - gesture-firebase
+          - gesture-firebase-user
+    env:
+      PATH: ${{ matrix.project }}/functions
+    name: Lint and Test for ${{ matrix.project }}
 
     steps:
       - name: Checkout code
@@ -37,49 +43,24 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Gesture Firebase
-      - name: Cache main node_modules
-        id: main-dependencies
+      - name: Cache node_modules
+        id: dependencies-cache
         uses: actions/cache@v4
         env:
-          PACKAGE_LOCK_PATH: ${{ env.MAIN_PATH }}/package-lock.json
+          PACKAGE_LOCK_PATH: ${{ env.PATH }}/package-lock.json
         with:
-          path: ${{ env.MAIN_PATH }}/node_modules
+          path: ${{ env.PATH }}/node_modules
           key: main-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
 
       - name: Install Gesture Firebase dependencies
         if: steps.main-dependencies.outputs.cache-hit != 'true'
-        run: cd ${{ env.MAIN_PATH }} && npm i
+        run: cd ${{ env.PATH }} && npm i
 
       - name: Compile Gesture Firebase Typescript
-        run: cd ${{ env.MAIN_PATH }} && npx tsc
+        run: cd ${{ env.PATH }} && npx tsc
 
       - name: Run Gesture Firebase ESLint
-        run: cd ${{ env.MAIN_PATH }} && npm run lint
+        run: cd ${{ env.PATH }} && npm run lint
 
       - name: Run Gesture Firebase Unit Tests
-        run: cd ${{ env.MAIN_PATH }} && npm test
-
-
-      # Gesture Firebase User
-      - name: Cache user node_modules
-        id: user-dependencies
-        uses: actions/cache@v4
-        env:
-          PACKAGE_LOCK_PATH: ${{ env.USER_PATH }}/package-lock.json
-        with:
-          path: ${{ env.USER_PATH }}/node_modules
-          key: main-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
-
-      - name: Install Gesture Firebase User dependencies
-        if: steps.user-dependencies.outputs.cache-hit != 'true'
-        run: cd ${{ env.USER_PATH }} && npm i
-
-      - name: Compile Gesture Firebase User Typescript
-        run: cd ${{ env.USER_PATH }} && npx tsc
-
-      - name: Run Gesture Firebase User ESLint
-        run: cd ${{ env.USER_PATH }} && npm run lint
-
-      - name: Run Gesture Firebase User Unit Tests
-        run: cd ${{ env.USER_PATH }} && npm test
+        run: cd ${{ env.PATH }} && npm test
