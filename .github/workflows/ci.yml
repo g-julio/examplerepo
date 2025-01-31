@@ -49,7 +49,7 @@ jobs:
         env:
           PACKAGE_LOCK_PATH: ${{ env.PROJECT_PATH }}/package-lock.json
           CACHE_KEY: ${{ matrix.project }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
-        run: echo "::set-output name=CACHE_KEY::${{ env.CACHE_KEY }}"
+        run: echo "CACHE_KEY=${{ env.CACHE_KEY }}" >> $GITHUB_OUTPUT
 
       - name: Cache node_modules
         id: dependencies-cache
