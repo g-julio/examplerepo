@@ -31,6 +31,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+
+  matrix-job:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: [1, 2, 3]  # Matrix of values to run jobs in parallel
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set an output for each matrix value
+        id: set-output
+        run: |
+          echo "Output for value ${{ matrix.value }} is $(( matrix.value * 2 ))" >> $GITHUB_ENV
+          echo "CACHE_KEY=$(( matrix.value * 2 ))" >> $GITHUB_OUTPUT
+
+    outputs:
+      value: ${{ steps.set-output.outputs.value }}  # Define the output to pass to the next job
+
+  next-job:
+    needs: matrix-job  # This ensures that the next job depends on the first job and its outputs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Display outputs from the matrix job
+        run: |
+          echo "Output from matrix job is: ${{ needs.matrix-job.outputs.value }}"
+
+
   define-env:
     name: Define Environment
     runs-on: ubuntu-latest
