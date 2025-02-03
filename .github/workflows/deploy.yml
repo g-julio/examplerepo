@@ -125,7 +125,9 @@ jobs:
         id: dependencies-cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.PROJECT_PATH }}/node_modules
+          path: |
+            ${{ env.PROJECT_PATH }}/node_modules
+            $(npm config get cache)
           key: ${{ steps.cache-key.outputs.CACHE_KEY }}
 
       - name: Install project Dependencies
