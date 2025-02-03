@@ -99,7 +99,7 @@ jobs:
       APP_ENV: ${{ needs.define-env.outputs.app_env }}
     environment: ${{ needs.define-env.outputs.app_env }}
     runs-on: ubuntu-latest
-    name: Deploy for ${{ matrix.project.name }}
+    name: Deploy ${{ needs.define-env.outputs.infisical_env }} ${{ matrix.project.name }}
 
     steps:
       - name: Checkout code
