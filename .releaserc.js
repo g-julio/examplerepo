@@ -6,7 +6,7 @@ const customTransform = require("semantic-release-npm-github-publish/commit-tran
  * @type {import('semantic-release').GlobalConfig} semantic-release configuration object.
  */
 module.exports = {
-  tagFormat: "v${version}",
+  tagFormat: "gesture-firebase-user-v${version}",
   branches: [
     "production"
   ],
