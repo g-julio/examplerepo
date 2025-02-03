@@ -6,10 +6,6 @@ on:
       - production
   workflow_dispatch:
   workflow_call:
-    outputs:
-      key:
-        description: 'Cache key for the current branch'
-        value: ${{ jobs.lint.outputs.cache-key }}
     inputs:
       source:
         required: true
@@ -33,8 +29,6 @@ jobs:
       PROJECT_PATH: ${{ matrix.project }}/functions
       PACKAGE_LOCK_PATH: ${{ matrix.project }}/functions/package-lock.json
     name: Lint and Test for ${{ matrix.project }}
-    outputs:
-      cache-key: ${{ steps.cache-key.outputs.CACHE_KEY }}
 
     steps:
       - name: Checkout code
@@ -45,20 +39,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Define cache key
-        id: cache-key
-        env:
-          CACHE_KEY: ${{ matrix.project }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
-        run: echo "CACHE_KEY=${{ env.CACHE_KEY }}" >> $GITHUB_OUTPUT
-
       - name: Cache node_modules
         id: dependencies-cache
         uses: actions/cache@v4
+        env:
+          CACHE_KEY: ${{ matrix.project }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
         with:
           path: |
             ${{ env.PROJECT_PATH }}/node_modules
             $(npm config get cache)
-          key: ${{ steps.cache-key.outputs.CACHE_KEY }}
+          key: ${{ env.CACHE_KEY }}
 
       - name: Install dependencies
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
