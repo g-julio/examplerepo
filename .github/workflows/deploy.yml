@@ -172,6 +172,7 @@ jobs:
         #   firebase deploy --project=${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }}
         run: |
           echo "Deploy project-${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }} "
+          cd ${{ env.PROJECT_PATH }}
           npm run lint
 
       - name: Sync Inngest functions
