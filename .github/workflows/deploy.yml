@@ -110,6 +110,14 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Cache node_modules
+        # id: dependencies-cache
+        # uses: actions/cache@v4
+        # with:
+        #   path: ${{ env.PROJECT_PATH }}/node_modules
+        #   key: ${{ needs.lint.outputs.key. }}
+        run: echo "value from lint ${{ toJson(needs.lint.outputs) }}"
+
       - name: Install project Dependencies
         run: |
           cd ${{ env.PROJECT_PATH }}
@@ -149,7 +157,7 @@ jobs:
         #   path: "./${{ env.PROJECT_PATH }}"
         run: echo "Deploy firebase indexes project- ${{ matrix.project[env.PROJECT_KEY] }}  path- ${{ env.PROJECT_PATH }}"
 
-      - name: Deploy Staging Gesture Firebase Functions
+      - name: Deploy Firebase Functions
         # Deploy only on push to staging or when gesture-firebase is selected or all projects is selected
         env:
           PROJECT_KEY: ${{ env.APP_ENV }}-project
