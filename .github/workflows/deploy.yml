@@ -48,7 +48,7 @@ jobs:
         id: set-output
         run: |
           echo "Output for value ${{ matrix.value }} is $((${{matrix.value}} * 2))"
-          echo "CACHE_KEY=$((${{matrix.value}} * 2))" >> $GITHUB_OUTPUT
+          echo "${{ matrix.value }}_CACHE_KEY=$((${{matrix.value}} * 2))" >> $GITHUB_OUTPUT
 
   next-job:
     needs: matrix-job  # This ensures that the next job depends on the first job and its outputs
