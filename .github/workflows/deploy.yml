@@ -94,6 +94,7 @@ jobs:
             functions: functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest
     env:
       PROJECT_PATH: ${{ matrix.project.name }}/functions
+      PACKAGE_LOCK_PATH: ${{ matrix.project.name }}/functions/package-lock.json
       INFISICAL_ENV: ${{ needs.define-env.outputs.infisical_env }}
       SA_KEY: ${{ secrets[matrix.project.sa-key-name] }}
       APP_ENV: ${{ needs.define-env.outputs.app_env }}
