@@ -60,7 +60,7 @@ jobs:
 
       - name: Display outputs from the matrix job
         run: |
-          echo "Output from matrix job is: ${{ needs.matrix-job.outputs.value }}"
+          echo "Output from matrix job is: ${{ toJson(needs.matrix-job.outputs) }}"
 
 
   define-env:
