@@ -12,7 +12,7 @@ on:
         description: "Select environment to deploy"
         required: true
         type: choice
-        default: "all"
+        default: "staging"
         options:
           - "staging"
           - "production"
