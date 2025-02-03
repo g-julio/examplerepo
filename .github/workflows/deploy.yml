@@ -45,8 +45,8 @@ jobs:
       - name: Set an output for each matrix value
         id: set-output
         run: |
-          echo "Output for value ${{ matrix.value }} is $(( matrix.value * 2 ))" >> $GITHUB_ENV
-          echo "CACHE_KEY=$(( matrix.value * 2 ))" >> $GITHUB_OUTPUT
+          echo "Output for value ${{ matrix.value }} is $(( ${{matrix.value}} * 2 ))" >> $GITHUB_ENV
+          echo "CACHE_KEY=$(( ${{matrix.value}} * 2 ))" >> $GITHUB_OUTPUT
 
     outputs:
       value: ${{ steps.set-output.outputs.value }}  # Define the output to pass to the next job
