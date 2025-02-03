@@ -52,7 +52,7 @@ jobs:
           if [[ "$BRANCH_REF" == *"heads/production" ]] || 
              (([[ "$BASE_REF" == *"heads/production" ]] || 
              [[ "$COMMITISH" == "production" ]]) && 
-             [[ "$TAG_REF" == refs/tags/v* ]]) ||
+             ([[ "$TAG_REF" == refs/tags/gesture-firebase-v* ]] || [[ "$TAG_REF" == refs/tags/gesture-firebase-user-v* ]])) ||
              [[ "${{ github.event.inputs.environment }}" == "production" ]]; then
             echo "APP_ENV=production" >> "$GITHUB_OUTPUT"
             echo "INFISICAL_ENV=prod" >> "$GITHUB_OUTPUT"
@@ -63,6 +63,7 @@ jobs:
 
   lint:
     needs: define-env
+    name: Linting ${{ needs.define-env.outputs.app_env }}
     uses: ./.github/workflows/ci.yml
     with:
       source: ${{ github.event_name }}
