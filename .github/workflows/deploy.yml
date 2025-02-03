@@ -137,6 +137,7 @@ jobs:
           npm ci
 
       - name: Install Firebase Tools
+        if: steps.dependencies-cache.outputs.cache-hit != 'true'
         run: npm install -g firebase-tools
 
       - name: Install Infisical CLI
@@ -180,6 +181,7 @@ jobs:
         run: |
           echo "Deploy project-${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }} "
           cd ${{ env.PROJECT_PATH }}
+          firebase --version
           npm run lint
 
       - name: Sync Inngest functions
