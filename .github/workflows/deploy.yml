@@ -31,42 +31,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-  matrix-job:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        value: [1, 2, 3]  # Matrix of values to run jobs in parallel
-    outputs:
-      # We will populate this dynamically within the job
-      CACHE_KEY: ${{ steps.set-output.outputs.cache_keys }} # Placeholder for the output
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set an output for each matrix value
-        id: set-output
-        run: |
-          # Calculate the output for each matrix value
-          result=$((${{ matrix.value }} * 2))
-          echo "Output for value ${{ matrix.value }} is $result"
-          # Save the result as a unique key in the output
-          echo "${{ matrix.value }}_CACHE_KEY=$result" >> $GITHUB_ENV  # For further usage within the job
-          echo "cache_keys=${{ matrix.value }}_CACHE_KEY=$result" >> $GITHUB_OUTPUT  # Save each matrix value output to a common output
-
-  next-job:
-    needs: matrix-job  # This ensures that the next job depends on the matrix job
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Display outputs from the matrix job
-        run: |
-          echo "Output from matrix job is: ${{ toJson(needs.matrix-job) }}"
-
-
   define-env:
     name: Define Environment
     runs-on: ubuntu-latest
@@ -146,15 +110,21 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Define cache key
+        id: cache-key
+        env:
+          CACHE_KEY: ${{ matrix.project.name }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
+        run: echo "CACHE_KEY=${{ env.CACHE_KEY }}" >> $GITHUB_OUTPUT
+
       - name: Cache node_modules
-        # id: dependencies-cache
-        # uses: actions/cache@v4
-        # with:
-        #   path: ${{ env.PROJECT_PATH }}/node_modules
-        #   key: ${{ needs.lint.outputs.key. }}
-        run: echo "value from lint ${{ toJson(needs.lint.outputs) }}"
+        id: dependencies-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PROJECT_PATH }}/node_modules
+          key: ${{ steps.cache-key.outputs.CACHE_KEY }}
 
       - name: Install project Dependencies
+        if: steps.dependencies-cache.outputs.cache-hit != 'true'
         run: |
           cd ${{ env.PROJECT_PATH }}
           npm ci
@@ -200,7 +170,9 @@ jobs:
         # run: |
         #   cd ${{ env.PROJECT_PATH }}
         #   firebase deploy --project=${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }}
-        run: echo "Deploy project-${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }} "
+        run: |
+          echo "Deploy project-${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }} "
+          npm run lint
 
       - name: Sync Inngest functions
         env:
