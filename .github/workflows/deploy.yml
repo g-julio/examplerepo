@@ -35,6 +35,8 @@ jobs:
 
   matrix-job:
     runs-on: ubuntu-latest
+    outputs:
+      CACHE_KEY: ${{ toJson(steps.set-output.outputs) }}
     strategy:
       matrix:
         value: [1, 2, 3]  # Matrix of values to run jobs in parallel
@@ -48,9 +50,6 @@ jobs:
           echo "Output for value ${{ matrix.value }} is $((${{matrix.value}} * 2))"
           echo "CACHE_KEY=$((${{matrix.value}} * 2))" >> $GITHUB_OUTPUT
 
-    outputs:
-      value: ${{ steps.set-output.outputs.value }}  # Define the output to pass to the next job
-
   next-job:
     needs: matrix-job  # This ensures that the next job depends on the first job and its outputs
     runs-on: ubuntu-latest
@@ -60,7 +59,7 @@ jobs:
 
       - name: Display outputs from the matrix job
         run: |
-          echo "Output from matrix job is: ${{ toJson(needs.matrix-job.outputs) }}"
+          echo "Output from matrix job is: ${{ toJson(needs.matrix-job) }}"
 
 
   define-env:
