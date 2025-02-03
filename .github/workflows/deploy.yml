@@ -63,6 +63,7 @@ jobs:
 
   lint:
     needs: define-env
+    name: ${{ needs.define-env.outputs.app_env }} CI
     uses: ./.github/workflows/ci.yml
     with:
       source: ${{ github.event_name }}
