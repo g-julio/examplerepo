@@ -115,18 +115,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Define cache key
-        id: cache-key
-        env:
-          CACHE_KEY: ${{ matrix.project.name }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
-        run: echo "CACHE_KEY=${{ env.CACHE_KEY }}" >> $GITHUB_OUTPUT
-
       - name: Cache node_modules
         id: dependencies-cache
         uses: actions/cache@v4
+        env:
+          CACHE_KEY: ${{ matrix.project.name }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
         with:
-          path: ${{ env.PROJECT_PATH }}/node_modules
-          key: ${{ steps.cache-key.outputs.CACHE_KEY }}
+          path: |
+            ${{ env.PROJECT_PATH }}/node_modules
+            $(npm config get cache)
+          key: ${{ env.CACHE_KEY }}
 
       - name: Install project Dependencies
         if: steps.dependencies-cache.outputs.cache-hit != 'true'
@@ -178,6 +176,7 @@ jobs:
         run: |
           echo "Deploy project-${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }} "
           cd ${{ env.PROJECT_PATH }}
+          firebase --version
           npm run lint
 
       - name: Sync Inngest functions
