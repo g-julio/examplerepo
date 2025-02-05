@@ -40,6 +40,7 @@ jobs:
     outputs:
       app_env: ${{ steps.define-env.outputs.APP_ENV }}
       infisical_env: ${{ steps.define-env.outputs.INFISICAL_ENV }}
+      projects: ${{ steps.define-projects.outputs.matrix }}
     steps:
       - name: Define environment
         id: define-env
@@ -60,6 +61,46 @@ jobs:
             echo "APP_ENV=staging" >> "$GITHUB_OUTPUT"
             echo "INFISICAL_ENV=staging" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Define projects to deploy
+        id: define-projects
+        env:
+          TAG_REF: ${{ github.ref }}
+        run: |
+          MATRIX_JSON="[]"
+
+          # Should deploy gesture-firebase?
+          if [[ "$TAG_REF" != refs/tags/gesture-firebase-user-v* ]] && [[ "${{github.event.inputs.environment}}" != "gesture-firebase-user"]]; then
+            MATRIX_JSON=$(echo $MATRIX_JSON | jq '. + [ 
+              {
+                "name": "gesture-firebase",
+                "sa-key-name": "GESTURE_FIREBASE_SA_KEY",
+                "staging-project": "gesture-dev",
+                "production-project": "yourgestureapp",
+                "inngest-url-key": "INNGEST_SYNC_MAIN_URL",
+                "functions": "functions:businessV2,functions:crm,functions:events,functions:grunnerv3,functions:merchants,functions:life,functions:nina,functions:SmartSend,functions:social,functions:gservices_3,functions:vendors,functions:backups,functions:service_merchant_tasks,functions:service_merchant_user,functions:service_nina_3,functions:service_business_group_orders,functions:service_business_orders,functions:service_business_users,functions:service_grunner_users,functions:service_grunner_tasks,functions:service_vendor_users,functions:service_vendor_order,functions:db_backup,functions:copy_backups_to_s3,functions:rotate_infisical_variables,functions:service_consumer_users_location_history_oncreate,functions:export_grunners_to_csv,functions:inngest,functions:stripe"
+              }
+            ]')
+          fi
+
+          # Should deploy gesture-firebase-user?
+          if [[ "$TAG_REF" != refs/tags/gesture-firebase-v* ]] && [[ "${{github.event.inputs.environment}}" != "gesture-firebase"]]; then
+            MATRIX_JSON=$(echo $MATRIX_JSON | jq '. + [ 
+              {
+                "name": "gesture-firebase-user",
+                "sa-key-name": "GESTURE_FIREBASE_USER_SA_KEY",
+                "staging-project": "gesture-dev-2",
+                "production-project": "gesture-user",
+                "inngest-url-key": "INNGEST_SYNC_USER_URL",
+                "functions": "functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest"
+              }
+            ]')
+          fi
+
+          echo "Generated Matrix:"
+          echo "$MATRIX_JSON" | jq .
+
+          echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
 
   lint:
     needs: define-env
@@ -83,19 +124,8 @@ jobs:
     needs: [lint, define-env]
     strategy:
       matrix:
-        project:
-          - name: gesture-firebase
-            sa-key-name: GESTURE_FIREBASE_SA_KEY
-            staging-project: gesture-dev
-            production-project: yourgestureapp
-            inngest-url-key: INNGEST_SYNC_MAIN_URL
-            functions: functions:businessV2,functions:crm,functions:events,functions:grunnerv3,functions:merchants,functions:life,functions:nina,functions:SmartSend,functions:social,functions:gservices_3,functions:vendors,functions:backups,functions:service_merchant_tasks,functions:service_merchant_user,functions:service_nina_3,functions:service_business_group_orders,functions:service_business_orders,functions:service_business_users,functions:service_grunner_users,functions:service_grunner_tasks,functions:service_vendor_users,functions:service_vendor_order,functions:db_backup,functions:copy_backups_to_s3,functions:rotate_infisical_variables,functions:service_consumer_users_location_history_oncreate,functions:export_grunners_to_csv,functions:inngest,functions:stripe
-          - name: gesture-firebase-user
-            sa-key-name: GESTURE_FIREBASE_USER_SA_KEY
-            staging-project: gesture-dev-2
-            production-project: gesture-user
-            inngest-url-key: INNGEST_SYNC_USER_URL
-            functions: functions:g3,functions:zoho_crm,functions:backups,functions:service_consumer_orders_3,functions:service_consumer_users_3,functions:db_backup,functions:copy_backups_to_s3,functions:inngest
+        project: ${{fromJson(needs.define-env.outputs.projects)}}
+
     env:
       PROJECT_PATH: ${{ matrix.project.name }}/functions
       PACKAGE_LOCK_PATH: ${{ matrix.project.name }}/functions/package-lock.json
