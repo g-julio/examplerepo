@@ -100,7 +100,7 @@ jobs:
           echo "Generated Matrix:"
           echo "$MATRIX_JSON" | jq .
 
-          echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
+          echo "matrix=$(echo $MATRIX_JSON | jq -c)" >> "$GITHUB_OUTPUT"
 
   lint:
     needs: define-env
