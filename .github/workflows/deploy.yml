@@ -70,7 +70,7 @@ jobs:
           MATRIX_JSON="[]"
 
           # Should deploy gesture-firebase?
-          if [[ "$TAG_REF" != refs/tags/gesture-firebase-user-v* ]] && [[ "${{github.event.inputs.environment}}" != "gesture-firebase-user" ]]; then
+          if [[ "$TAG_REF" != refs/tags/gesture-firebase-user-v* ]] && [[ "${{github.event.inputs.project}}" != "gesture-firebase-user" ]]; then
             MATRIX_JSON=$(echo $MATRIX_JSON | jq '. + [ 
               {
                 "name": "gesture-firebase",
@@ -84,7 +84,7 @@ jobs:
           fi
 
           # Should deploy gesture-firebase-user?
-          if [[ "$TAG_REF" != refs/tags/gesture-firebase-v* ]] && [[ "${{github.event.inputs.environment}}" != "gesture-firebase" ]]; then
+          if [[ "$TAG_REF" != refs/tags/gesture-firebase-v* ]] && [[ "${{github.event.inputs.project}}" != "gesture-firebase" ]]; then
             MATRIX_JSON=$(echo $MATRIX_JSON | jq '. + [ 
               {
                 "name": "gesture-firebase-user",
