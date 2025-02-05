@@ -42,6 +42,8 @@ jobs:
       infisical_env: ${{ steps.define-env.outputs.INFISICAL_ENV }}
       projects: ${{ steps.define-projects.outputs.matrix }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Install Infisical CLI
         uses: ./.github/actions/infisical-cli
