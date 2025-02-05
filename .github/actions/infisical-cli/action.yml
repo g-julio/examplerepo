@@ -1,5 +1,0 @@
-name: "Install Infisical CLI"
-description: "Installs the Infisical CLI on the runner"
-runs:
-  using: "docker"
-  image: "Dockerfile"
