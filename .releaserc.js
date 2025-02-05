@@ -1,12 +1,11 @@
-const { releaseRules } = require("semantic-release-npm-github-publish");
-const customTransform = require("semantic-release-npm-github-publish/commit-transform");
-
 /**
  * Gesture Semantic Release Configuration Factory
- * @type {import('semantic-release').GlobalConfig} semantic-release configuration object.
+ *
+ * @param {Function} customTransform custom commit transformation function.
+ * @param {Array} releaseRules custom release rules.
+ * @return {import('semantic-release').GlobalConfig} semantic-release configuration object.
  */
-module.exports = {
-  tagFormat: "gesture-firebase-user-v${version}",
+module.exports = (customTransform, releaseRules) => ({
   branches: [
     "production"
   ],
@@ -36,4 +35,4 @@ module.exports = {
       return customTransform(commit, context);
     }
   },
-};
+});
