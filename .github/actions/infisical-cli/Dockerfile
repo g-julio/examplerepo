@@ -2,7 +2,7 @@ FROM ubuntu:rolling
 
 RUN apt-get update && apt-get install -y \
     curl \
-    && curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | -E bash \
+    && curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | bash \
     && apt-get update && apt-get install -y infisical
 
 # Setting the entrypoint to be a no-op, since we’re just preparing the environment
