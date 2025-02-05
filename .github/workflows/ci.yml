@@ -4,6 +4,10 @@ on:
   pull_request:
     branches-ignore:
       - production
+  push:
+    branches-ignore:
+      - production
+      - staging
   workflow_dispatch:
   workflow_call:
     inputs:
