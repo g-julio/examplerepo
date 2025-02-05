@@ -42,6 +42,15 @@ jobs:
       infisical_env: ${{ steps.define-env.outputs.INFISICAL_ENV }}
       projects: ${{ steps.define-projects.outputs.matrix }}
     steps:
+
+      - name: Install Infisical CLI
+        uses: ./.github/actions/infisical-cli
+
+      - name: Use Infisical CLI
+        run: |
+          infisical --version  # Check if it’s installed
+          # Add your Infisical CLI commands here!
+
       - name: Define environment
         id: define-env
         env:
