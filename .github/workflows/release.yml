@@ -35,4 +35,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm ci && npx semantic-release
+          cd gesture-firebase/functions && npm ci && npx semantic-release
+
+      - name: Gesture Firebase User release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd gesture-firebase-user/functions && npm ci && npx semantic-release
