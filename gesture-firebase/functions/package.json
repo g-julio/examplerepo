@@ -5,6 +5,8 @@
   "main": "dist/src/index.js",
   "dependencies": {
     "dayjs": "^1.11.13",
+    "semantic-release": "24.0.0",
+    "semantic-release-npm-github-publish": "1.5.4",
     "typescript": "^5.7.3"
   },
   "devDependencies": {
