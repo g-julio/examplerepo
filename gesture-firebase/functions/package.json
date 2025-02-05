@@ -4,6 +4,7 @@
   "private": true,
   "main": "dist/src/index.js",
   "dependencies": {
+    "dayjs": "^1.11.13",
     "typescript": "^5.7.3"
   },
   "devDependencies": {

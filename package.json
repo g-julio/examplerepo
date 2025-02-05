@@ -45,7 +45,7 @@
     "react-toastify": "^7.0.4",
     "react-use": "^17.3.2",
     "react-window": "^1.8.7",
-    "semantic-release": "^24.0.0",
+    "semantic-release": "24.0.0",
     "semantic-release-npm-github-publish": "1.5.4",
     "styled-components": "^5.3.6",
     "validator": "^13.7.0",
