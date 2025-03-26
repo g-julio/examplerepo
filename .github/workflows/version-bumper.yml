@@ -9,7 +9,7 @@ jobs:
   bumper:
     name: Version Bumper
     runs-on: ubuntu-latest
-    if: github.head_ref != 'production'
+    if: ${{ github.head_ref != 'production' }}
     permissions:
       contents: write
     env:
