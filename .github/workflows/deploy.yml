@@ -130,7 +130,7 @@ jobs:
       PROJECT_PATH: ${{ matrix.project.name }}/functions
       PACKAGE_LOCK_PATH: ${{ matrix.project.name }}/functions/package-lock.json
       INFISICAL_ENV: ${{ needs.define-env.outputs.infisical_env }}
-      SA_KEY: ${{ secrets[matrix.project.sa-key-name] }}
+      SA_KEY: ${{ env.TEST_JSON_VALUE }}
       APP_ENV: ${{ needs.define-env.outputs.app_env }}
     environment: ${{ needs.define-env.outputs.app_env }}
     runs-on: ubuntu-latest
@@ -145,73 +145,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Cache node_modules
-        id: dependencies-cache
-        uses: actions/cache@v4
+      - name: Run Knex Migrations
+        if: ${{ matrix.project.name == 'gesture-firebase' }}
         env:
-          CACHE_KEY: ${{ matrix.project.name }}-npm-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles( env.PACKAGE_LOCK_PATH ) }}
-        with:
-          path: |
-            ${{ env.PROJECT_PATH }}/node_modules
-            $(npm config get cache)
-          key: ${{ env.CACHE_KEY }}
-
-      - name: Install project Dependencies
-        if: steps.dependencies-cache.outputs.cache-hit != 'true'
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ env.RUNNER_TEMP }}/service_account.json
         run: |
           cd ${{ env.PROJECT_PATH }}
-          npm ci
-
-      - name: Install Firebase Tools
-        run: npm install -g firebase-tools
-
-      - name: Install Infisical CLI
-        run: |
-          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
-          sudo apt-get update && sudo apt-get install -y infisical
-
-      - name: Login to Infisical and export envs
-        env:
-          DEBUG_COMMAND: echo "${{ matrix.project.name }} env:" && grep -E "^[^ ]+ *=.*" "${{ env.PROJECT_PATH }}/.env" | cut -d"=" -f1
-        # run: |
-          # export INFISICAL_TOKEN=$(infisical login --method=universal-auth --client-id=${{ secrets.INFISICAL_CLIENT_ID }} --client-secret=${{ secrets.INFISICAL_CLIENT_SECRET }} --silent --plain)
-          # infisical export --env="${{ env.INFISICAL_ENV }}" --projectId=aea3c23d-9186-4645-a246-d35c6b438b3c --path="/${{ matrix.project.name }}" > ${{ env.PROJECT_PATH }}/.env
-          # ${{ secrets.DEBUG == 'true' && env.DEBUG_COMMAND || 'echo ""' }}
-        run: |
-          echo "login infisical debug: ${{ env.DEBUG_COMMAND }}"
-
-      - name: Firebase Google Auth
-        # Run only on tagged release or when gesture-firebase is selected or all projects is selected
-        # uses: google-github-actions/auth@v2
-        # with:
-        #   credentials_json: ${{ env.SA_KEY }}
-        run: echo "use google-github-actions/auth@v2 with credentials_json ${{ env.SA_KEY }}"
-
-      - name: Deploy firebase indexes
-        env:
-          PROJECT_KEY: ${{ env.APP_ENV }}-project
-        # uses: ./.github/actions/deploy-firebase-indexes
-        # with:
-        #   project: ${{ matrix.project[env.PROJECT_KEY] }}
-        #   path: "./${{ env.PROJECT_PATH }}"
-        run: echo "Deploy firebase indexes project- ${{ matrix.project[env.PROJECT_KEY] }}  path- ${{ env.PROJECT_PATH }}"
-
-      - name: Deploy Firebase Functions
-        # Deploy only on push to staging or when gesture-firebase is selected or all projects is selected
-        env:
-          PROJECT_KEY: ${{ env.APP_ENV }}-project
-        # run: |
-        #   cd ${{ env.PROJECT_PATH }}
-        #   firebase deploy --project=${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }}
-        run: |
-          echo "Deploy project-${{ matrix.project[env.PROJECT_KEY] }} --only ${{ matrix.project.functions }} "
-          cd ${{ env.PROJECT_PATH }}
-          firebase --version
-          npm run lint
-
-      - name: Sync Inngest functions
-        env:
-          INNGEST_SYNC_URL: ${{ secrets[matrix.project.inngest-url-key] }}
-        # run: |
-        #   curl -sS --fail -X PUT ${{ env.INNGEST_SYNC_URL }} || (echo -e "\033[31mInngest sync failed! \033[0m" && exit 1)
-        run: echo "Sync inngest url- ${{ env.INNGEST_SYNC_URL }}"
+          echo "This is the current path: $GOOGLE_APPLICATION_CREDENTIALS"
+          echo "$SA_KEY" > $GOOGLE_APPLICATION_CREDENTIALS
+          cat $GOOGLE_APPLICATION_CREDENTIALS
+          npx -y dotenv-cli -- npm run knex migrate:latest
