@@ -130,7 +130,7 @@ jobs:
       PROJECT_PATH: ${{ matrix.project.name }}/functions
       PACKAGE_LOCK_PATH: ${{ matrix.project.name }}/functions/package-lock.json
       INFISICAL_ENV: ${{ needs.define-env.outputs.infisical_env }}
-      SA_KEY: ${{ env.TEST_JSON_VALUE }}
+      SA_KEY: ${{ secrets.TEST_JSON_VALUE }}
       APP_ENV: ${{ needs.define-env.outputs.app_env }}
     environment: ${{ needs.define-env.outputs.app_env }}
     runs-on: ubuntu-latest
