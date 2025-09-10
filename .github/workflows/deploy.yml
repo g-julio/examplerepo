@@ -131,7 +131,7 @@ jobs:
       - name: Run Knex Migrations
         if: ${{ matrix.project.name == 'gesture-firebase' }}
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: $RUNNER_TEMP/service_account.json
+          GOOGLE_APPLICATION_CREDENTIALS: "${{ env.RUNNER_TEMP }}/service_account.json"
         run: |
           cd ${{ env.PROJECT_PATH }}
           echo "This is the current path: $GOOGLE_APPLICATION_CREDENTIALS"
