@@ -102,26 +102,9 @@ jobs:
 
           echo "matrix=$(echo $MATRIX_JSON | jq -c)" >> "$GITHUB_OUTPUT"
 
-  lint:
-    needs: define-env
-    name: Linting ${{ needs.define-env.outputs.app_env }}
-    uses: ./.github/workflows/ci.yml
-    with:
-      source: ${{ github.event_name }}
-      reference: ${{ github.event.release.tag_name || github.ref_name }}
-
-  indexes:
-    if: (startsWith(github.ref, 'refs/heads/staging')) || github.event.inputs.environment == 'staging'
-    uses: ./.github/workflows/exportFirestoreIndexs.yml
-    needs: lint
-    permissions:
-      contents: write
-    with:
-      source: ${{ github.event_name }}
-      reference: ${{ github.event.release.tag_name || github.ref_name }}
 
   deploy:
-    needs: [lint, define-env]
+    needs: [define-env]
     strategy:
       matrix:
         project: ${{fromJson(needs.define-env.outputs.projects)}}
