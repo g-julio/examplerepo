@@ -1,0 +1,85 @@
+name: EAS Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select Environment to OTA to"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+jobs:
+  define-env:
+    name: Define Environment
+    runs-on: ubuntu-latest
+    outputs:
+      app_env: ${{ steps.define-env.outputs.APP_ENV }}
+    steps:
+      - name: Define environment
+        id: define-env
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "APP_ENV=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "APP_ENV=staging" >> "$GITHUB_OUTPUT"
+          fi
+
+  update:
+    name: Update to ${{ needs.define-env.outputs.app_env }}
+    runs-on: ubuntu-latest
+    needs: define-env
+    environment: ${{ needs.define-env.outputs.app_env }}
+    env:
+      INFISICAL_PROJECT_ID: ea0ee4ae-5c6e-4ffd-b70c-1d97571bc1cd
+      INFISICAL_PATH: /gesture-consumer
+    steps:
+      - name: 🏗 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🏗 Install dependencies
+        run: echo "npm ci"
+
+      - name: Install Infisical CLI
+        run: |
+          echo "curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash"
+          echo "sudo apt-get update && sudo apt-get install -y infisical"
+
+      - name: 🏗 Setup Expo and EAS
+        # uses: expo/expo-github-action@v8
+        # with:
+        #   eas-version: latest
+        run: |
+          echo "token: EXPO_TOKEN"
+
+      - name: Update EAS environment
+        # uses: ./.github/actions/eas-env-setup
+        # with:
+        #   infisical_project_id: ${{ env.INFISICAL_PROJECT_ID }}
+        #   infisical_path: ${{ env.INFISICAL_PATH }}
+        #   # infisical_client_id: ${{ secrets.INFISICAL_CLIENT_ID }}
+        #   # infisical_client_secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+        #   profile: ${{ needs.define-env.outputs.app_env }}
+        run: |
+          echo "infisical_project_id: ${{ env.INFISICAL_PROJECT_ID }}"
+          echo "infisical_path: ${{ env.INFISICAL_PATH }}"
+          echo "profile: ${{ needs.define-env.outputs.app_env }}"
+
+      - name: 🚀 Create OTA update (${{ needs.define-env.outputs.app_env }})
+        run: |
+          echo "npm version $(npx dotenv-cli -- eas build:list  --channel=${{ needs.define-env.outputs.app_env }} --limit=1 --distribution=store --status=finished --json --non-interactive | jq -r '.[0].runtimeVersion') --git-tag-version false --allow-same-version true"
+          echo "sed -i 's/\"requireCommit\": true/\"requireCommit\": false/' eas.json"
+          echo "npx dotenv-cli -- eas update --branch ${{ needs.define-env.outputs.app_env }} --message=\"$(git log -1 --pretty=%B)\" --non-interactive"
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
